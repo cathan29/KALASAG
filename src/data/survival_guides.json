@@ -1,0 +1,61 @@
+{
+  "first_aid": [
+    {
+      "condition": "CPR",
+      "steps": [
+        "Check for responsiveness",
+        "Call emergency services",
+        "Place hands in center of chest",
+        "Push hard and fast (100-120 bpm)",
+        "Allow chest to recoil completely"
+      ]
+    },
+    {
+      "condition": "Choking",
+      "steps": [
+        "Ask 'Are you choking?'",
+        "Stand behind the person",
+        "Wrap arms around waist",
+        "Make a fist and place it above the navel",
+        "Perform quick, upward abdominal thrusts"
+      ]
+    },
+    {
+      "condition": "Bleeding",
+      "steps": [
+        "Apply direct pressure with a clean cloth",
+        "Maintain pressure until bleeding stops",
+        "Elevate the wound above heart level if possible",
+        "Avoid removing embedded objects"
+      ]
+    },
+    {
+      "condition": "Burns",
+      "steps": [
+        "Cool the burn with cool running water for 10-20 minutes",
+        "Remove restrictive clothing or jewelry",
+        "Cover with a loose, sterile gauze bandage",
+        "Do not apply ice, butter, or ointments to severe burns"
+      ]
+    }
+  ],
+  "evacuation": {
+    "protocols": [
+      "Identify all possible exit routes from your home and neighborhood",
+      "Establish a family meeting point",
+      "Pack a Go-Bag (3 days of supplies)",
+      "Turn off utilities (gas, water, electricity) if instructed",
+      "Follow designated evacuation signs and official directives"
+    ],
+    "go_bag_essentials": [
+      "Water (1 gallon per person per day)",
+      "Non-perishable food",
+      "First aid kit",
+      "Flashlight and extra batteries",
+      "Battery-powered or hand-crank radio",
+      "Personal documents in waterproof container",
+      "Basic hygiene items",
+      "Prescription medications"
+    ]
+  }
+}
