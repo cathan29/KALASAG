@@ -1,0 +1,23 @@
+[
+  {
+    "id": "pagasa-typhoon-bulletins",
+    "source": "PAGASA",
+    "title": "Tropical Cyclone Bulletins",
+    "summary": "Official cyclone bulletins should be ingested by backend or curated release data, not scraped by the mobile app.",
+    "status": "Curated source"
+  },
+  {
+    "id": "ndrrmc-advisories",
+    "source": "NDRRMC",
+    "title": "National Disaster Advisories",
+    "summary": "Use as the authoritative national advisory source when a controlled feed is available.",
+    "status": "Needs approved ingestion"
+  },
+  {
+    "id": "local-drrmo",
+    "source": "LGU / MDRRMO",
+    "title": "Local DRRM Advisories",
+    "summary": "Best source for evacuation routes, local shelters, and municipal hotline changes.",
+    "status": "Offline-ready data model"
+  }
+]

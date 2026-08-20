@@ -7,16 +7,55 @@ const useWeatherStore = create(
   persist(
     (set, get) => ({
       weatherData: null,
+      userLocation: null,
+      locationLabel: 'Locating...',
+      locationPermissionStatus: 'undetermined',
       lastUpdated: null,
       isLoading: false,
+      isLocating: false,
       error: null,
 
-      fetchWeather: async () => {
+      setLocationLoading: (isLocating) => set({ isLocating }),
+      setLocationPermissionStatus: (locationPermissionStatus) => set({ locationPermissionStatus }),
+      setUserLocation: ({ latitude, longitude, label = 'Current Location' }) => set({
+        userLocation: {
+          latitude: Number(latitude),
+          longitude: Number(longitude),
+        },
+        locationLabel: label,
+      }),
+      setLocationError: (message) => set({
+        isLocating: false,
+        locationPermissionStatus: 'denied',
+        locationLabel: 'Location unavailable',
+        error: message,
+      }),
+
+      fetchWeather: async (locationOverride) => {
+        const location = locationOverride ?? get().userLocation;
+
+        if (!location) {
+          set({
+            isLoading: false,
+            error: 'Allow location access to load local weather.',
+          });
+          return;
+        }
+
         set({ isLoading: true, error: null });
         try {
-          const data = await weatherApi.fetchWeather();
+          const response = await weatherApi.fetchWeather({
+            ...location,
+            label: get().locationLabel,
+          });
+          const rawTemp = response.data?.current?.temperature_2m;
+          const temperature = Number.isFinite(Number(rawTemp)) ? Math.round(Number(rawTemp)) : 'N/A';
+
           set({
-            weatherData: data,
+            weatherData: {
+              ...response.data,
+              temperature,
+            },
             lastUpdated: new Date().toISOString(),
             isLoading: false,
             error: null,
@@ -26,13 +65,19 @@ const useWeatherStore = create(
             isLoading: false,
             error: err instanceof Error ? err.message : 'An unknown error occurred while fetching weather',
           });
-          // Note: weatherData remains as it was (either from previous success or persisted cache)
         }
       },
     }),
     {
       name: 'weather-storage',
       storage: createJSONStorage(() => AsyncStorage),
+      partialize: (state) => ({
+        weatherData: state.weatherData,
+        userLocation: state.userLocation,
+        locationLabel: state.locationLabel,
+        locationPermissionStatus: state.locationPermissionStatus,
+        lastUpdated: state.lastUpdated,
+      }),
     }
   )
 );

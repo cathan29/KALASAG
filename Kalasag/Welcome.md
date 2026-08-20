@@ -1,5 +1,22 @@
-This is your new *vault*.
+# KALASAG System Notes
 
-Make a note of something, [[create a link]], or try [the Importer](https://help.obsidian.md/Plugins/Importer)!
+Last updated: 2026-08-21
 
-When you're ready, delete this note and make the vault your own.
+This vault tracks the current state of the KALASAG mobile app: architecture, product behavior, integrations, UI decisions, and known external limitations.
+
+## Quick Links
+
+- [[System Status - 2026-08-21]]
+- [[Frontend Architecture]]
+- [[Data Sources and API Notes]]
+- [[Emergency Directory Logic]]
+
+## Current Product Direction
+
+KALASAG is an offline-first disaster preparedness and situational awareness mobile app. The current implementation focuses on:
+
+- GPS-based local weather
+- Weather radar map with RainViewer tiles
+- ReliefWeb-based hazard report feed with graceful fallback
+- Location-aware emergency hotlines from bundled local data
+- Premium deep navy/slate UI with floating tabs, cards, gradients, icons, skeleton loaders, and Lottie empty states

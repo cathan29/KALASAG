@@ -1,7 +1,16 @@
 {
+  "default": {
+    "title": "National Emergency Hotlines",
+    "hotlines": {
+      "emergency": "911",
+      "red_cross": "143",
+      "ndrrmc": "02-8911-1406"
+    }
+  },
   "national": {
     "emergency": "911",
-    "red_cross": "143"
+    "red_cross": "143",
+    "ndrrmc": "02-8911-1406"
   },
   "regions": {
     "NCR": {
@@ -27,6 +36,24 @@
       "pnp": "082-123-4568",
       "bfp": "082-123-4569",
       "red_cross": "082-123-4570"
+    }
+  },
+  "municipalities": {
+    "Dagupan City": {
+      "province": "Pangasinan",
+      "hotlines": {
+        "pnp_dagupan_city": "075-522-1234",
+        "bfp_dagupan_city": "075-522-2345",
+        "mdrrmo_dagupan_city": "075-522-3456"
+      }
+    },
+    "Rosales": {
+      "province": "Pangasinan",
+      "hotlines": {
+        "pnp_rosales": "075-582-1234",
+        "bfp_rosales": "075-582-2345",
+        "mdrrmo_rosales": "075-582-3456"
+      }
     }
   }
 }

@@ -1,28 +1,60 @@
 export const THEME = {
   colors: {
-    background: '#000000', // Pure black for OLED
-    surface: '#121212',    // Slightly lighter black for cards/surfaces
-    primary: '#BB86FC',    // Soft purple
-    secondary: '#03DAC6',  // Teal
-    error: '#CF6679',      // Soft red
+    background: '#0F172A',
+    backgroundAlt: '#111C33',
+    surface: '#1E293B',
+    surfaceElevated: '#263449',
+    surfaceSoft: '#334155',
+    primary: '#3B82F6',
+    primarySoft: '#1D4ED8',
+    secondary: '#38BDF8',
+    warning: '#F59E0B',
+    error: '#EF4444',
+    success: '#22C55E',
+    mapOverlay: 'rgba(15, 23, 42, 0.84)',
     text: {
-      primary: '#FFFFFF',   // White
-      secondary: '#B0B0B0', // Grey
-      disabled: '#666666',  // Dark grey
+      primary: '#F8FAFC',
+      secondary: '#CBD5E1',
+      muted: '#94A3B8',
+      disabled: '#64748B',
+      inverse: '#0F172A',
     },
-    border: '#2C2C2C',      // Dark border
+    border: 'rgba(148, 163, 184, 0.18)',
+  },
+  gradients: {
+    weather: ['#2563EB', '#1D4ED8', '#0F172A'],
+    emergency: ['#EF4444', '#B91C1C', '#1E293B'],
+    calm: ['#1E293B', '#263449'],
   },
   spacing: {
-    xs: '4px',
-    sm: '8px',
-    md: '16px',
-    lg: '24px',
-    xl: '32px',
+    xs: 4,
+    sm: 8,
+    md: 16,
+    lg: 24,
+    xl: 32,
+    xxl: 40,
   },
   borderRadius: {
-    sm: '4px',
-    md: '8px',
-    lg: '12px',
-    full: '9999px',
+    sm: 8,
+    md: 12,
+    lg: 16,
+    xl: 24,
+    full: 999,
+  },
+  shadows: {
+    card: {
+      shadowColor: '#020617',
+      shadowOffset: { width: 0, height: 12 },
+      shadowOpacity: 0.28,
+      shadowRadius: 22,
+      elevation: 8,
+    },
+    subtle: {
+      shadowColor: '#020617',
+      shadowOffset: { width: 0, height: 7 },
+      shadowOpacity: 0.18,
+      shadowRadius: 14,
+      elevation: 4,
+    },
   },
 };

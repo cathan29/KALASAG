@@ -14,8 +14,19 @@
     "assetBundlePatterns": [
       "**/*"
     ],
+    "plugins": [
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "Kalasag uses your location to show local weather, radar, and nearby disaster alerts."
+        }
+      ]
+    ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "infoPlist": {
+        "NSLocationWhenInUseUsageDescription": "Kalasag uses your location to show nearby disaster alerts on the map."
+      }
     },
     "android": {
       "adaptiveIcon": {
