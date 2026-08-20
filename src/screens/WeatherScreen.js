@@ -13,6 +13,7 @@ import { THEME } from '../constants/theme';
 import { useNetworkStatus } from '../hooks/useNetworkStatus';
 import SkeletonLoader from '../components/SkeletonLoader';
 import EmptyState from '../components/EmptyState';
+import GlassCard from '../components/GlassCard';
 
 const weatherIconForCode = (code) => {
   if ([0, 1].includes(code)) return 'sunny';
@@ -187,12 +188,12 @@ const WeatherScreen = () => {
 
       <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.hourlyStrip}>
         {nextHours.map((item) => (
-          <View key={item.time} style={styles.hourCard}>
+          <GlassCard key={item.time} style={styles.hourCard}>
             <Text style={styles.hourTime}>{new Date(item.time).toLocaleTimeString([], { hour: 'numeric' })}</Text>
             <Ionicons name={weatherIconForCode(item.code)} size={22} color={THEME.colors.secondary} />
             <Text style={styles.hourTemp}>{formatValue(item.temp, '°')}</Text>
             <Text style={styles.hourRain}>{formatValue(item.rainChance, '% rain')}</Text>
-          </View>
+          </GlassCard>
         ))}
       </ScrollView>
 
@@ -201,7 +202,7 @@ const WeatherScreen = () => {
         <Text style={styles.sectionTitle}>3-Day Outlook</Text>
       </View>
 
-      <View style={styles.forecastCard}>
+      <GlassCard style={styles.forecastCard}>
         {(daily?.time ?? []).slice(0, 3).map((date, index) => (
           <View key={date} style={styles.forecastRow}>
             <View style={styles.forecastDay}>
@@ -216,19 +217,19 @@ const WeatherScreen = () => {
             <Text style={styles.forecastRain}>{formatValue(daily?.precipitation_sum?.[index], ' mm')}</Text>
           </View>
         ))}
-      </View>
+      </GlassCard>
     </ScrollView>
   );
 };
 
 const MetricCard = ({ icon, label, value, tint }) => (
-  <View style={styles.metricCard}>
+  <GlassCard style={styles.metricCard}>
     <View style={[styles.metricIcon, { backgroundColor: `${tint}22` }]}>
       <Ionicons name={icon} size={20} color={tint} />
     </View>
     <Text style={styles.metricLabel}>{label}</Text>
     <Text style={styles.metricValue}>{value}</Text>
-  </View>
+  </GlassCard>
 );
 
 const styles = StyleSheet.create({

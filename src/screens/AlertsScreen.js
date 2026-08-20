@@ -11,6 +11,7 @@ import { THEME } from '../constants/theme';
 import { useNetworkStatus } from '../hooks/useNetworkStatus';
 import EmptyState from '../components/EmptyState';
 import SkeletonLoader from '../components/SkeletonLoader';
+import GlassCard from '../components/GlassCard';
 import bulletins from '../data/official_bulletins.json';
 
 const severityStyle = (severity) => {
@@ -44,7 +45,7 @@ const AlertsScreen = () => {
     const tone = severityStyle(item.severity);
 
     return (
-      <View style={styles.alertCard}>
+      <GlassCard style={styles.alertCard}>
         <View style={styles.alertHeader}>
           <View style={[styles.alertIcon, { backgroundColor: `${tone.color}22` }]}>
             <Ionicons name={tone.icon} size={22} color={tone.color} />
@@ -66,7 +67,7 @@ const AlertsScreen = () => {
             <Text style={styles.locationBadgeText}>{item.coordinates ? 'Mapped' : 'Unmapped'}</Text>
           </View>
         </View>
-      </View>
+      </GlassCard>
     );
   };
 
@@ -103,7 +104,7 @@ const AlertsScreen = () => {
         contentContainerStyle={styles.listContent}
         ListHeaderComponent={
           <>
-            <View style={styles.summaryCard}>
+            <GlassCard style={styles.summaryCard}>
               <View style={styles.summaryTop}>
                 <View>
                   <Text style={styles.eyebrow}>Live</Text>
@@ -116,9 +117,9 @@ const AlertsScreen = () => {
                 <SummaryMetric label="Mapped" value={activeHazards} />
                 <SummaryMetric label="Feed" value="RW" />
               </View>
-            </View>
+            </GlassCard>
 
-            <View style={styles.sourceCard}>
+            <GlassCard style={styles.sourceCard}>
               <View style={styles.sourceHeader}>
                 <Ionicons name="newspaper" size={20} color={THEME.colors.secondary} />
                 <Text style={styles.sourceTitle}>Official Feeds</Text>
@@ -129,7 +130,7 @@ const AlertsScreen = () => {
                   <Text style={styles.sourceCopy}>{bulletin.status}</Text>
                 </View>
               ))}
-            </View>
+            </GlassCard>
           </>
         }
         ListEmptyComponent={

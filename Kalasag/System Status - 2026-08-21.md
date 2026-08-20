@@ -13,6 +13,10 @@ The app has moved from a barebones Expo prototype into a more complete premium R
 - UI theme changed from pure black to deep navy/slate.
 - Added gradients, skeleton loading, Lottie empty states, floating tabs, and stronger card design.
 - Latest UI pass removed web-like explanatory copy and moved screens toward compact, icon-led mobile app surfaces.
+- Latest visual pass uses iPhone-style translucent glass surfaces, softer shadows, and a floating tab bar without native blur views.
+- App icon assets were replaced with a cleaner generated KALASAG shield/radar mark to avoid the old generic logo.
+- Web/unsupported preview fallbacks were added for native-only surfaces so raw "unimplemented component" screens are avoided during development.
+- Native `ExpoBlurView` rendering was disabled after Expo Go showed red unimplemented component blocks on mobile.
 
 ## Runtime Flow
 
@@ -117,6 +121,9 @@ Current behavior:
 - Deep slate surface, subtle shadow.
 - Native icon tabs for Weather, Alerts, Radar, Ready, and SOS.
 - Default React Navigation headers are hidden so each screen owns its visual hierarchy.
+- Tab blur now falls back gracefully when blur is unsupported.
+- Latest navbar pass uses shorter labels, a 76px floating bar, tighter icon pills, and no full-width active item background.
+- Weather is labeled "Now" in the tab bar to reduce crowding across five tabs.
 
 ## Theme
 
@@ -146,6 +153,8 @@ Notes:
 - `react-native-reanimated` is installed.
 - Current skeleton shimmer uses React Native `Animated` plus `expo-linear-gradient` to avoid unnecessary Babel complexity.
 - `babel-preset-expo` is pinned to the Expo SDK 54 compatible version.
+- `GlassCard` wraps key panels with translucent styling, borders, sheen, and shadows so the UI feels polished without requiring native blur support.
+- `GlassCard`, `EmptyState`, and `MapScreen` include platform-aware fallbacks for unsupported preview environments.
 
 ## Verification Already Run
 
@@ -156,6 +165,9 @@ Recent checks:
 - `npx expo export --platform android --output-dir .expo-export-check --clear` completed successfully.
 - Temporary export folder was removed after verification.
 - Latest UI-only patch was rechecked with `node --check` on touched screen/navigation files and a successful Android Expo export.
+- Glass UI pass was rechecked with `node --check` and `npx expo export --platform android --output-dir .expo-export-check --clear`.
+- Logo/fallback pass was rechecked with `node --check`, source scans for mojibake/unimplemented markers, and a successful Android Expo export.
+- Navbar spacing pass was rechecked with `node --check`, Android export, and web export.
 
 ## Known Constraints
 

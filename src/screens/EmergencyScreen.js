@@ -14,6 +14,7 @@ import { Ionicons, MaterialIcons, MaterialCommunityIcons } from '@expo/vector-ic
 import hotlines from '../data/hotlines.json';
 import survivalGuides from '../data/survival_guides.json';
 import { THEME } from '../constants/theme';
+import GlassCard from '../components/GlassCard';
 
 const formatLabel = (label) => label.replace(/_/g, ' ').toUpperCase();
 
@@ -94,7 +95,7 @@ const EmergencyScreen = () => {
   };
 
   const renderHotline = (label, number, tone = THEME.colors.secondary) => (
-    <View key={`${label}-${number}`} style={styles.hotlineRow}>
+    <GlassCard key={`${label}-${number}`} style={styles.hotlineRow}>
       <View style={[styles.hotlineIcon, { backgroundColor: `${tone}22` }]}>
         <Ionicons name="call" size={21} color={tone} />
       </View>
@@ -110,7 +111,7 @@ const EmergencyScreen = () => {
         <Text style={styles.callActionText}>Dial</Text>
         <Ionicons name="call" size={16} color={THEME.colors.text.primary} />
       </TouchableOpacity>
-    </View>
+    </GlassCard>
   );
 
   const renderGuideStep = (step, index) => (
@@ -137,7 +138,7 @@ const EmergencyScreen = () => {
         </View>
       </LinearGradient>
 
-      <View style={styles.searchCard}>
+      <GlassCard style={styles.searchCard}>
         <View style={styles.detectedRow}>
           <View style={styles.detectedIcon}>
             <Ionicons name={isDetecting ? 'navigate' : 'location'} size={18} color={THEME.colors.secondary} />
@@ -169,7 +170,7 @@ const EmergencyScreen = () => {
         {searchQuery && !searchedMunicipality ? (
           <Text style={styles.searchMiss}>No match for "{searchQuery}".</Text>
         ) : null}
-      </View>
+      </GlassCard>
 
       <View style={styles.sectionHeader}>
         <MaterialCommunityIcons name="shield-home" size={22} color={THEME.colors.secondary} />
@@ -211,11 +212,11 @@ const EmergencyScreen = () => {
         <Text style={styles.sectionTitle}>National</Text>
       </View>
 
-      <View style={styles.directoryCard}>
+      <GlassCard style={styles.directoryCard}>
         {Object.entries(hotlines.default?.hotlines ?? hotlines.national).map(([label, number]) => (
           renderHotline(label, number, THEME.colors.primary)
         ))}
-      </View>
+      </GlassCard>
 
       <View style={styles.sectionHeader}>
         <MaterialIcons name="travel-explore" size={23} color={THEME.colors.secondary} />
@@ -223,10 +224,10 @@ const EmergencyScreen = () => {
       </View>
 
       {Object.entries(hotlines.regions).map(([region, lines]) => (
-        <View key={region} style={styles.regionCard}>
+        <GlassCard key={region} style={styles.regionCard}>
           <Text style={styles.regionName}>{region}</Text>
           {Object.entries(lines).map(([label, number]) => renderHotline(label, number))}
-        </View>
+        </GlassCard>
       ))}
 
       <View style={styles.sectionHeader}>
@@ -235,7 +236,7 @@ const EmergencyScreen = () => {
       </View>
 
       {survivalGuides.first_aid.map((guide) => (
-        <View key={guide.condition} style={styles.guideCard}>
+        <GlassCard key={guide.condition} style={styles.guideCard}>
           <View style={styles.guideTitleRow}>
             <View style={styles.guideIcon}>
               <MaterialCommunityIcons name="medical-bag" size={21} color={THEME.colors.warning} />
@@ -243,10 +244,10 @@ const EmergencyScreen = () => {
             <Text style={styles.guideTitle}>{guide.condition}</Text>
           </View>
           {guide.steps.map(renderGuideStep)}
-        </View>
+        </GlassCard>
       ))}
 
-      <View style={styles.guideCard}>
+      <GlassCard style={styles.guideCard}>
         <View style={styles.guideTitleRow}>
           <View style={styles.guideIcon}>
             <MaterialIcons name="directions-run" size={22} color={THEME.colors.warning} />
@@ -257,7 +258,7 @@ const EmergencyScreen = () => {
 
         <Text style={styles.guideSubTitle}>Go-Bag Essentials</Text>
         {survivalGuides.evacuation.go_bag_essentials.map(renderGuideStep)}
-      </View>
+      </GlassCard>
     </ScrollView>
   );
 };

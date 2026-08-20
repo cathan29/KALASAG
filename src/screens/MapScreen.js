@@ -1,19 +1,33 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
   ActivityIndicator,
+  Platform,
   ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from 'react-native';
-import MapView, { Marker, PROVIDER_GOOGLE, UrlTile } from 'react-native-maps';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { THEME } from '../constants/theme';
 import { useNetworkStatus } from '../hooks/useNetworkStatus';
 import { useAlertsStore } from '../store/useAlertsStore';
 import useWeatherStore from '../store/useWeatherStore';
 import { fetchRadarFrames } from '../services/radarApi';
+import GlassCard from '../components/GlassCard';
+
+let MapView;
+let Marker;
+let PROVIDER_GOOGLE;
+let UrlTile;
+
+if (Platform.OS !== 'web') {
+  const Maps = require('react-native-maps');
+  MapView = Maps.default;
+  Marker = Maps.Marker;
+  PROVIDER_GOOGLE = Maps.PROVIDER_GOOGLE;
+  UrlTile = Maps.UrlTile;
+}
 
 const OSM_TILE_URL = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
 const DEFAULT_REGION_DELTA = {
@@ -101,6 +115,38 @@ const MapScreen = () => {
     );
   }
 
+  if (Platform.OS === 'web' || !MapView) {
+    return (
+      <View style={styles.container}>
+        <View style={styles.radarFallback}>
+          <View style={styles.radarRingOuter}>
+            <View style={styles.radarRingMiddle}>
+              <View style={styles.radarRingInner}>
+                <MaterialCommunityIcons name="radar" size={44} color={THEME.colors.secondary} />
+              </View>
+            </View>
+          </View>
+        </View>
+
+        <GlassCard style={styles.topHud}>
+          <View style={styles.hudTitleRow}>
+            <MaterialCommunityIcons name="radar" size={24} color={THEME.colors.secondary} />
+            <View style={styles.hudTitleText}>
+              <Text style={styles.hudTitle}>Radar</Text>
+              <Text style={styles.hudSubtitle} numberOfLines={1}>{locationLabel}</Text>
+            </View>
+          </View>
+          <View style={styles.hudMetrics}>
+            <View style={styles.hudMetric}>
+              <Ionicons name="phone-portrait-outline" size={16} color={THEME.colors.secondary} />
+              <Text style={styles.hudMetricText}>Open on device</Text>
+            </View>
+          </View>
+        </GlassCard>
+      </View>
+    );
+  }
+
   return (
     <View style={styles.container}>
       <MapView
@@ -155,7 +201,7 @@ const MapScreen = () => {
         ))}
       </MapView>
 
-      <View style={styles.topHud}>
+      <GlassCard style={styles.topHud}>
         <View style={styles.hudTitleRow}>
           <MaterialCommunityIcons name="radar" size={24} color={THEME.colors.secondary} />
           <View style={styles.hudTitleText}>
@@ -202,7 +248,7 @@ const MapScreen = () => {
         ) : null}
 
         <Text style={styles.attributionText}>Radar tiles by RainViewer · Base map by OpenStreetMap contributors</Text>
-      </View>
+      </GlassCard>
     </View>
   );
 };
@@ -214,6 +260,41 @@ const styles = StyleSheet.create({
   },
   map: {
     ...StyleSheet.absoluteFillObject,
+  },
+  radarFallback: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: THEME.colors.background,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  radarRingOuter: {
+    width: 260,
+    height: 260,
+    borderRadius: 130,
+    borderWidth: 1,
+    borderColor: 'rgba(125, 211, 252, 0.24)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(59, 130, 246, 0.08)',
+  },
+  radarRingMiddle: {
+    width: 174,
+    height: 174,
+    borderRadius: 87,
+    borderWidth: 1,
+    borderColor: 'rgba(125, 211, 252, 0.32)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  radarRingInner: {
+    width: 92,
+    height: 92,
+    borderRadius: 46,
+    borderWidth: 1,
+    borderColor: THEME.colors.borderStrong,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: THEME.colors.glass,
   },
   center: {
     flex: 1,

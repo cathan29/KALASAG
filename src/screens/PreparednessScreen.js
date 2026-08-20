@@ -10,6 +10,7 @@ import {
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { THEME } from '../constants/theme';
+import GlassCard from '../components/GlassCard';
 import usePreparednessStore from '../store/usePreparednessStore';
 import useWeatherStore from '../store/useWeatherStore';
 import shelters from '../data/shelters.json';
@@ -57,7 +58,7 @@ const PreparednessScreen = () => {
       </LinearGradient>
 
       <SectionTitle icon="bookmark" title="Saved Places" />
-      <View style={styles.card}>
+      <GlassCard style={styles.card}>
         <TouchableOpacity style={styles.primaryButton} onPress={saveCurrentLocation} activeOpacity={0.84}>
           <Ionicons name="add-circle" size={18} color={THEME.colors.text.primary} />
           <Text style={styles.primaryButtonText}>Save Location</Text>
@@ -78,10 +79,10 @@ const PreparednessScreen = () => {
         )) : (
           <Text style={styles.emptyHint}>No saved places</Text>
         )}
-      </View>
+      </GlassCard>
 
       <SectionTitle icon="bag-check" title={`Go-Bag ${completion}%`} />
-      <View style={styles.card}>
+      <GlassCard style={styles.card}>
         {kitItems.map((item) => (
           <TouchableOpacity key={item.id} style={styles.checkRow} onPress={() => toggleKitItem(item.id)} activeOpacity={0.8}>
             <Ionicons
@@ -92,29 +93,29 @@ const PreparednessScreen = () => {
             <Text style={[styles.checkText, item.done && styles.checkTextDone]}>{item.label}</Text>
           </TouchableOpacity>
         ))}
-      </View>
+      </GlassCard>
 
       <SectionTitle icon="people" title="Family Plan" />
-      <View style={styles.card}>
+      <GlassCard style={styles.card}>
         <PlanInput label="Meeting place" value={familyPlan.meetingPlace} onChangeText={(value) => updateFamilyPlan('meetingPlace', value)} />
         <PlanInput label="Out-of-town contact" value={familyPlan.outOfTownContact} onChangeText={(value) => updateFamilyPlan('outOfTownContact', value)} />
         <PlanInput label="Medical notes" value={familyPlan.medicalNotes} onChangeText={(value) => updateFamilyPlan('medicalNotes', value)} multiline />
-      </View>
+      </GlassCard>
 
       <SectionTitle icon="business" title="Shelters" />
       <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.horizontalList}>
         {shelters.map((shelter) => (
-          <View key={shelter.id} style={styles.shelterCard}>
+          <GlassCard key={shelter.id} style={styles.shelterCard}>
             <Ionicons name="home" size={22} color={THEME.colors.secondary} />
             <Text style={styles.shelterName}>{shelter.name}</Text>
             <Text style={styles.shelterArea}>{shelter.area}</Text>
             <Text style={styles.shelterMeta}>{shelter.type} · {shelter.capacity}</Text>
-          </View>
+          </GlassCard>
         ))}
       </ScrollView>
 
       <SectionTitle icon="newspaper" title="Feeds" />
-      <View style={styles.card}>
+      <GlassCard style={styles.card}>
         {bulletins.map((bulletin) => (
           <View key={bulletin.id} style={styles.bulletinRow}>
             <View style={styles.rowIcon}>
@@ -127,7 +128,7 @@ const PreparednessScreen = () => {
             </View>
           </View>
         ))}
-      </View>
+      </GlassCard>
     </ScrollView>
   );
 };
