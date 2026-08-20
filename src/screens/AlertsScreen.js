@@ -8,6 +8,7 @@ import {
 } from 'react-native';
 import { useAlertsStore } from '../store/useAlertsStore';
 import { THEME } from '../constants/theme';
+import { useNetworkStatus } from '../hooks/useNetworkStatus';
 
 const AlertsScreen = () => {
   const {
@@ -16,6 +17,7 @@ const AlertsScreen = () => {
     error,
     fetchAlerts,
   } = useAlertsStore();
+  const isOffline = useNetworkStatus();
 
   useEffect(() => {
     fetchAlerts();
@@ -43,6 +45,14 @@ const AlertsScreen = () => {
     return (
       <View style={styles.center}>
         <ActivityIndicator size="large" color={THEME.colors.primary} />
+      </View>
+    );
+  }
+
+  if (!alertsData && !isLoading && isOffline) {
+    return (
+      <View style={styles.center}>
+        <Text style={styles.emptyText}>No data available yet. Please connect to the internet once to sync.</Text>
       </View>
     );
   }
@@ -138,6 +148,8 @@ const styles = StyleSheet.create({
   emptyText: {
     color: THEME.colors.text.secondary,
     fontSize: 16,
+    textAlign: 'center',
+    marginHorizontal: 20,
   },
 });
 

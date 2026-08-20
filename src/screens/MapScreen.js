@@ -2,11 +2,15 @@ import React from 'react';
 import {
   StyleSheet,
   View,
+  Text,
 } from 'react-native';
 import MapView, { PROVIDER_GOOGLE } from 'react-native-maps';
 import { THEME } from '../constants/theme';
+import { useNetworkStatus } from '../hooks/useNetworkStatus';
 
 const MapScreen = () => {
+  const isOffline = useNetworkStatus();
+
   const initialRegion = {
     latitude: 12.8797,
     longitude: 121.7740,
@@ -95,6 +99,16 @@ const MapScreen = () => {
     }
   ];
 
+  if (isOffline) {
+    return (
+      <View style={styles.container}>
+        <View style={styles.fallbackContainer}>
+          <Text style={styles.fallbackText}>Map Unavailable Offline. Please connect to the internet to view the hazard map.</Text>
+        </View>
+      </View>
+    );
+  }
+
   return (
     <View style={styles.container}>
       <MapView
@@ -114,6 +128,17 @@ const styles = StyleSheet.create({
   },
   map: {
     ...StyleSheet.absoluteFillObject,
+  },
+  fallbackContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  fallbackText: {
+    fontSize: 16,
+    color: THEME.colors.text.secondary,
+    textAlign: 'center',
   },
 });
 

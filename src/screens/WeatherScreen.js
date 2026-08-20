@@ -9,6 +9,7 @@ import {
 } from 'react-native';
 import useWeatherStore from '../store/useWeatherStore';
 import { THEME } from '../constants/theme';
+import { useNetworkStatus } from '../hooks/useNetworkStatus';
 
 const WeatherScreen = () => {
   const {
@@ -17,6 +18,7 @@ const WeatherScreen = () => {
     error,
     fetchWeather,
   } = useWeatherStore();
+  const isOffline = useNetworkStatus();
 
   useEffect(() => {
     fetchWeather();
@@ -30,6 +32,14 @@ const WeatherScreen = () => {
     return (
       <View style={styles.center}>
         <ActivityIndicator size="large" color={THEME.colors.primary} />
+      </View>
+    );
+  }
+
+  if (!weatherData && !isLoading && isOffline) {
+    return (
+      <View style={styles.center}>
+        <Text style={styles.infoText}>No data available yet. Please connect to the internet once to sync.</Text>
       </View>
     );
   }
@@ -141,6 +151,8 @@ const styles = StyleSheet.create({
   infoText: {
     color: THEME.colors.text.secondary,
     fontSize: 16,
+    textAlign: 'center',
+    marginHorizontal: 20,
   },
 });
 
