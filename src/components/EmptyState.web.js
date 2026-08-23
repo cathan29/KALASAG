@@ -1,60 +1,84 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import LottieView from 'lottie-react-native';
-import { THEME } from '../constants/theme';
+import { useTheme } from 'react-native-paper';
+
+const STATE_ICONS = {
+  offline: 'cloud-offline-outline',
+  location: 'location-outline',
+  error: 'alert-circle-outline',
+};
 
 const EmptyState = ({
   title = 'Walang naitalang sakuna ngayon. Ligtas ang araw!',
   message,
-}) => (
-  <View style={styles.card}>
-    <View style={styles.animationWrap}>
-      <LottieView
-        source={require('../../assets/animations/safe-state.json')}
-        autoPlay
-        loop
-        resizeMode="contain"
-        style={styles.animation}
-      />
-    </View>
-    <Text style={styles.title}>{title}</Text>
-    {message ? <Text style={styles.message}>{message}</Text> : null}
-  </View>
-);
+  variant = 'safe',
+}) => {
+  const theme = useTheme();
+  const styles = useMemo(() => createStyles(theme), [theme]);
 
-const styles = StyleSheet.create({
-  card: {
-    ...THEME.shadows.subtle,
-    alignItems: 'center',
-    backgroundColor: THEME.colors.surface,
-    borderRadius: THEME.borderRadius.xl,
-    padding: THEME.spacing.xl,
-    borderWidth: 1,
-    borderColor: THEME.colors.border,
-  },
-  animationWrap: {
-    width: 200,
-    height: 200,
+  return (
+    <View style={styles.container}>
+      {variant === 'safe' ? (
+        <LottieView
+          source={require('@meteocons/lottie/fill/clear-day.json')}
+          autoPlay
+          loop
+          speed={0.7}
+          resizeMode="contain"
+          style={styles.animation}
+        />
+      ) : (
+        <View style={[styles.iconShell, variant === 'error' && styles.errorShell]}>
+          <Ionicons
+            name={STATE_ICONS[variant] ?? 'information-circle-outline'}
+            size={34}
+            color={variant === 'error' ? theme.colors.error : theme.colors.primary}
+          />
+        </View>
+      )}
+      <Text style={styles.title}>{title}</Text>
+      {message ? <Text style={styles.message}>{message}</Text> : null}
+    </View>
+  );
+};
+
+const createStyles = (theme) => StyleSheet.create({
+  container: {
     alignItems: 'center',
     justifyContent: 'center',
+    minHeight: 300,
+    paddingHorizontal: theme.spacing.lg,
+    paddingVertical: theme.spacing.xl,
   },
-  animation: {
-    width: 200,
-    height: 200,
+  animation: { width: 112, height: 112 },
+  iconShell: {
+    width: 72,
+    height: 72,
+    borderRadius: 36,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: theme.colors.primaryContainer,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: theme.colors.border,
   },
+  errorShell: { backgroundColor: theme.colors.errorContainer },
   title: {
-    color: THEME.colors.text.primary,
-    fontSize: 20,
-    fontWeight: '900',
+    color: theme.colors.text.primary,
+    fontSize: 19,
+    fontWeight: '700',
     lineHeight: 26,
-    marginTop: THEME.spacing.md,
+    marginTop: theme.spacing.sm,
     textAlign: 'center',
+    letterSpacing: 0,
   },
   message: {
-    color: THEME.colors.text.secondary,
+    color: theme.colors.text.secondary,
     fontSize: 14,
     lineHeight: 21,
-    marginTop: THEME.spacing.sm,
+    marginTop: theme.spacing.sm,
+    maxWidth: 310,
     textAlign: 'center',
   },
 });

@@ -2,11 +2,47 @@ import React, { useEffect, useMemo } from 'react';
 import { AppState, RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
+import LottieView from 'lottie-react-native';
 import { Surface, useTheme } from 'react-native-paper';
 import useWeatherStore from '../store/useWeatherStore';
 import { useNetworkStatus } from '../hooks/useNetworkStatus';
 import SkeletonLoader from '../components/SkeletonLoader';
 import EmptyState from '../components/EmptyState';
+
+const WEATHER_ANIMATIONS = {
+  clearDay: require('@meteocons/lottie/fill/clear-day.json'),
+  clearNight: require('@meteocons/lottie/fill/clear-night.json'),
+  partlyCloudyDay: require('@meteocons/lottie/fill/partly-cloudy-day.json'),
+  partlyCloudyNight: require('@meteocons/lottie/fill/partly-cloudy-night.json'),
+  overcast: require('@meteocons/lottie/fill/overcast.json'),
+  fog: require('@meteocons/lottie/fill/fog.json'),
+  drizzle: require('@meteocons/lottie/fill/drizzle.json'),
+  rain: require('@meteocons/lottie/fill/rain.json'),
+  sleet: require('@meteocons/lottie/fill/sleet.json'),
+  snow: require('@meteocons/lottie/fill/snow.json'),
+  thunderstorms: require('@meteocons/lottie/fill/thunderstorms.json'),
+  thunderstormsExtreme: require('@meteocons/lottie/fill/thunderstorms-extreme.json'),
+};
+
+const isDaytime = (time) => {
+  const hour = new Date(time ?? Date.now()).getHours();
+  return hour >= 6 && hour < 18;
+};
+
+const weatherAnimationForCode = (code, time) => {
+  const daytime = isDaytime(time);
+  if (code === 0) return daytime ? WEATHER_ANIMATIONS.clearDay : WEATHER_ANIMATIONS.clearNight;
+  if ([1, 2].includes(code)) return daytime ? WEATHER_ANIMATIONS.partlyCloudyDay : WEATHER_ANIMATIONS.partlyCloudyNight;
+  if (code === 3) return WEATHER_ANIMATIONS.overcast;
+  if ([45, 48].includes(code)) return WEATHER_ANIMATIONS.fog;
+  if ([51, 53, 55].includes(code)) return WEATHER_ANIMATIONS.drizzle;
+  if ([56, 57, 66, 67].includes(code)) return WEATHER_ANIMATIONS.sleet;
+  if ([61, 63, 65, 80, 81, 82].includes(code)) return WEATHER_ANIMATIONS.rain;
+  if ([71, 73, 75, 77, 85, 86].includes(code)) return WEATHER_ANIMATIONS.snow;
+  if ([96, 99].includes(code)) return WEATHER_ANIMATIONS.thunderstormsExtreme;
+  if (code === 95) return WEATHER_ANIMATIONS.thunderstorms;
+  return daytime ? WEATHER_ANIMATIONS.partlyCloudyDay : WEATHER_ANIMATIONS.partlyCloudyNight;
+};
 
 const weatherIconForCode = (code) => {
   if ([0, 1].includes(code)) return 'sunny';
@@ -80,13 +116,13 @@ const WeatherScreen = () => {
 
   if ((isLoading || isLocating) && !weatherData) return <SkeletonLoader variant="weather" />;
   if (!weatherData && locationPermissionStatus === 'denied') {
-    return <View style={styles.center}><EmptyState title="Location access needed" message="Enable location to see weather where you are." /></View>;
+    return <View style={styles.center}><EmptyState variant="location" title="Location access needed" message="Enable location to see weather where you are." /></View>;
   }
   if (!weatherData && !isLoading && isOffline) {
-    return <View style={styles.center}><EmptyState title="Weather is offline" message="Connect once to save your local forecast." /></View>;
+    return <View style={styles.center}><EmptyState variant="offline" title="Weather is offline" message="Connect once to save your local forecast." /></View>;
   }
   if (error && !weatherData) {
-    return <View style={styles.center}><EmptyState title="Weather unavailable" message={error} /></View>;
+    return <View style={styles.center}><EmptyState variant="error" title="Weather unavailable" message={error} /></View>;
   }
 
   const risk = buildRisk({
@@ -119,7 +155,16 @@ const WeatherScreen = () => {
             <Text style={styles.now}>NOW</Text>
             <Text style={styles.condition}>{weatherData?.condition ?? 'Local weather'}</Text>
           </View>
-          <Ionicons name={weatherIconForCode(current.weather_code)} size={52} color="#FFFFFF" />
+          <View style={styles.weatherAnimationFrame}>
+            <LottieView
+              source={weatherAnimationForCode(current.weather_code, current.time)}
+              autoPlay
+              loop
+              speed={0.75}
+              resizeMode="contain"
+              style={styles.weatherAnimation}
+            />
+          </View>
         </View>
         <View style={styles.temperatureRow}>
           <Text style={styles.temperature}>{formatValue(current.temperature_2m, '°')}</Text>
@@ -207,6 +252,8 @@ const createStyles = (theme) => StyleSheet.create({
   hero: { minHeight: 282, borderRadius: theme.borderRadius.lg, padding: 20, justifyContent: 'space-between', overflow: 'hidden' },
   heroTop: { flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'space-between', gap: theme.spacing.md },
   heroCopy: { flex: 1 },
+  weatherAnimationFrame: { width: 84, height: 84, alignItems: 'center', justifyContent: 'center', marginTop: -8, marginRight: -4 },
+  weatherAnimation: { width: 84, height: 84 },
   now: { color: 'rgba(255,255,255,0.72)', fontSize: 12, fontWeight: '700' },
   condition: { color: '#FFFFFF', fontSize: 25, lineHeight: 31, fontWeight: '700', marginTop: 3 },
   temperatureRow: { alignItems: 'center' },

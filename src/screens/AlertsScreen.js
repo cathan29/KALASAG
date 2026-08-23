@@ -109,10 +109,10 @@ const AlertsScreen = () => {
 
   if (isLoading && alertsData === null) return <SkeletonLoader variant="list" />;
   if (alertsData === null && !isLoading && isOffline) {
-    return <View style={styles.center}><EmptyState title="Alerts unavailable offline" message="Connect once to save the latest advisories." /></View>;
+    return <View style={styles.center}><EmptyState variant="offline" title="Alerts unavailable offline" message="Connect once to save the latest advisories." /></View>;
   }
   if (alertsData === null && error) {
-    return <View style={styles.center}><EmptyState title="Alert feed unavailable" message={error} /><Chip icon="refresh" onPress={refreshAlerts}>Try again</Chip></View>;
+    return <View style={styles.center}><EmptyState variant="error" title="Alert feed unavailable" message={error} /><Chip icon="refresh" onPress={refreshAlerts}>Try again</Chip></View>;
   }
 
   const header = (

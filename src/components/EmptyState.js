@@ -1,24 +1,43 @@
 import React, { useMemo } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import LottieView from 'lottie-react-native';
 import { useTheme } from 'react-native-paper';
+
+const STATE_ICONS = {
+  offline: 'cloud-offline-outline',
+  location: 'location-outline',
+  error: 'alert-circle-outline',
+};
 
 const EmptyState = ({
   title = 'Walang naitalang sakuna ngayon. Ligtas ang araw!',
   message,
+  variant = 'safe',
 }) => {
   const theme = useTheme();
   const styles = useMemo(() => createStyles(theme), [theme]);
 
   return (
     <View style={styles.container}>
-      <LottieView
-        source={require('../../assets/animations/safe-state.json')}
-        autoPlay
-        loop
-        resizeMode="contain"
-        style={styles.animation}
-      />
+      {variant === 'safe' ? (
+        <LottieView
+          source={require('@meteocons/lottie/fill/clear-day.json')}
+          autoPlay
+          loop
+          speed={0.7}
+          resizeMode="contain"
+          style={styles.animation}
+        />
+      ) : (
+        <View style={[styles.iconShell, variant === 'error' && styles.errorShell]}>
+          <Ionicons
+            name={STATE_ICONS[variant] ?? 'information-circle-outline'}
+            size={34}
+            color={variant === 'error' ? theme.colors.error : theme.colors.primary}
+          />
+        </View>
+      )}
       <Text style={styles.title}>{title}</Text>
       {message ? <Text style={styles.message}>{message}</Text> : null}
     </View>
@@ -33,7 +52,18 @@ const createStyles = (theme) => StyleSheet.create({
     paddingHorizontal: theme.spacing.lg,
     paddingVertical: theme.spacing.xl,
   },
-  animation: { width: 148, height: 148 },
+  animation: { width: 112, height: 112 },
+  iconShell: {
+    width: 72,
+    height: 72,
+    borderRadius: 36,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: theme.colors.primaryContainer,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: theme.colors.border,
+  },
+  errorShell: { backgroundColor: theme.colors.errorContainer },
   title: {
     color: theme.colors.text.primary,
     fontSize: 19,

@@ -565,9 +565,10 @@ const WindyLoadingState = () => {
       >
         <View style={styles.loadingAnimationFrame}>
           <LottieView
-            source={require('../../assets/animations/loading.json')}
+            source={require('@meteocons/lottie/fill/wind.json')}
             autoPlay
             loop
+            speed={0.8}
             resizeMode="contain"
             style={styles.loadingAnimation}
           />
