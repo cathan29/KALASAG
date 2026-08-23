@@ -173,7 +173,7 @@ const formatHour = (hour) => {
   return `${hour - 12} PM`;
 };
 
-const MapScreen = () => {
+const MapScreen = ({ route }) => {
   const webViewRef = useRef(null);
   const viewportRef = useRef(null);
   const [coordinate, setCoordinate] = useState(null);
@@ -187,6 +187,9 @@ const MapScreen = () => {
   const [selectedDayIndex, setSelectedDayIndex] = useState(0);
   const [selectedHour, setSelectedHour] = useState(new Date().getHours());
   const [isTimelinePlaying, setIsTimelinePlaying] = useState(false);
+  const focusLatitude = Number(route?.params?.focusCoordinates?.latitude);
+  const focusLongitude = Number(route?.params?.focusCoordinates?.longitude);
+  const hasFocusCoordinate = Number.isFinite(focusLatitude) && Number.isFinite(focusLongitude);
 
   const forecastDays = useMemo(() => buildForecastDays(), []);
   const isLoading = isLocating || (!hasLoadedWebView && isWebViewLoading) || !windyUrl;
@@ -245,6 +248,18 @@ const MapScreen = () => {
   useEffect(() => {
     let isMounted = true;
 
+    if (hasFocusCoordinate) {
+      const focusedCoordinate = { latitude: focusLatitude, longitude: focusLongitude };
+      setError(null);
+      setIsLocating(false);
+      setCoordinate(focusedCoordinate);
+      viewportRef.current = { ...focusedCoordinate, zoom: 10 };
+      setHasLoadedWebView(false);
+      setIsWebViewLoading(true);
+      setWindyUrl(buildWindyUrl(focusedCoordinate, selectedOverlay));
+      return () => { isMounted = false; };
+    }
+
     const loadCurrentLocation = async () => {
       setIsLocating(true);
       setError(null);
@@ -288,7 +303,7 @@ const MapScreen = () => {
     return () => {
       isMounted = false;
     };
-  }, []);
+  }, [focusLatitude, focusLongitude, hasFocusCoordinate]);
 
   useEffect(() => {
     if (!isTimelinePlaying || isLoading) return undefined;

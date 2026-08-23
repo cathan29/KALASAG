@@ -5,13 +5,14 @@ import * as Haptics from 'expo-haptics';
 import { Button, Checkbox, IconButton, ProgressBar, Surface, TextInput, TouchableRipple, useTheme } from 'react-native-paper';
 import usePreparednessStore from '../store/usePreparednessStore';
 import useWeatherStore from '../store/useWeatherStore';
-import shelters from '../data/shelters.json';
+import useSheltersStore from '../store/useSheltersStore';
 
-const PreparednessScreen = () => {
+const PreparednessScreen = ({ navigation }) => {
   const theme = useTheme();
   const styles = useMemo(() => createStyles(theme), [theme]);
   const { savedLocations, kitItems, familyPlan, addSavedLocation, removeSavedLocation, toggleKitItem, updateFamilyPlan } = usePreparednessStore();
   const { userLocation, locationLabel } = useWeatherStore();
+  const { shelters, lastUpdated: sheltersLastUpdated } = useSheltersStore();
   const completedCount = kitItems.filter((item) => item.done).length;
   const completion = kitItems.length ? completedCount / kitItems.length : 0;
 
@@ -88,17 +89,19 @@ const PreparednessScreen = () => {
       </Surface>
 
       <SectionTitle title="Nearby shelters" styles={styles} />
-      <Surface elevation={1} style={styles.group}>
-        {shelters.map((shelter, index) => (
-          <View key={shelter.id} style={[styles.shelterRow, index > 0 && styles.separator]}>
-            <Ionicons name="business-outline" size={21} color={theme.colors.secondary} />
-            <View style={styles.rowCopy}>
-              <Text style={styles.rowTitle}>{shelter.name}</Text>
-              <Text style={styles.rowSubtitle}>{shelter.area} · {shelter.type}</Text>
-            </View>
-            <Text style={styles.capacity}>{shelter.capacity}</Text>
-          </View>
-        ))}
+      <Surface elevation={1} style={styles.shelterFinder}>
+        <View style={styles.shelterFinderIcon}>
+          <Ionicons name="business-outline" size={25} color={theme.colors.secondary} />
+        </View>
+        <View style={styles.shelterFinderCopy}>
+          <Text style={styles.rowTitle}>Find evacuation centers</Text>
+          <Text style={styles.rowSubtitle}>
+            {shelters.length
+              ? `${shelters.length} saved offline${sheltersLastUpdated ? ' · ready to view' : ''}`
+              : 'Search nearby centers and save an offline copy'}
+          </Text>
+        </View>
+        <IconButton icon="chevron-right" onPress={() => navigation.navigate('Shelters')} accessibilityLabel="Open evacuation centers" />
       </Surface>
     </ScrollView>
   );
@@ -141,8 +144,9 @@ const createStyles = (theme) => StyleSheet.create({
   checkLabel: { flex: 1, color: theme.colors.text.primary, fontSize: 14 },
   checkedLabel: { color: theme.colors.text.muted, textDecorationLine: 'line-through' },
   form: { backgroundColor: theme.colors.surface, borderRadius: theme.borderRadius.md, padding: 12, gap: 10, borderWidth: StyleSheet.hairlineWidth, borderColor: theme.colors.border },
-  shelterRow: { minHeight: 68, flexDirection: 'row', alignItems: 'center', gap: 11, paddingHorizontal: theme.spacing.md },
-  capacity: { color: theme.colors.text.muted, fontSize: 11, maxWidth: 68, textAlign: 'right' },
+  shelterFinder: { minHeight: 84, flexDirection: 'row', alignItems: 'center', gap: 12, paddingLeft: theme.spacing.md, borderRadius: theme.borderRadius.md, backgroundColor: theme.colors.surface, borderWidth: StyleSheet.hairlineWidth, borderColor: theme.colors.border },
+  shelterFinderIcon: { width: 46, height: 46, borderRadius: 23, alignItems: 'center', justifyContent: 'center', backgroundColor: theme.colors.primaryContainer },
+  shelterFinderCopy: { flex: 1, minWidth: 0 },
 });
 
 export default PreparednessScreen;

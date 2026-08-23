@@ -10,6 +10,8 @@
 - React Navigation bottom tabs
 - `react-native-maps`
 - `expo-location`
+- `expo-notifications`
+- `expo-dev-client`
 - `expo-linear-gradient`
 - `lottie-react-native`
 - `@expo/vector-icons`
@@ -35,6 +37,29 @@ File: `src/store/useAlertsStore.js`
 Owns:
 
 - ReliefWeb alert/report data
+- Last updated timestamp
+- Loading and error state
+
+### Notification Store
+
+File: `src/store/useNotificationStore.js`
+
+Owns:
+
+- Notification permission status
+- Enabled/Disabled toggle
+- Notification radius (km)
+- Quiet hours settings (Start/End, Enabled toggle)
+- Set of notified alert IDs (to prevent duplicates)
+
+### Shelters Store
+
+File: `src/store/useSheltersStore.js`
+
+Owns:
+
+- Cached list of nearby shelters
+- Search radius
 - Last updated timestamp
 - Loading and error state
 
@@ -83,9 +108,9 @@ Purpose:
 ## Mobile-First Product Areas
 
 - Weather: large native hero card, risk summary, metric cards, hourly rain strip, short "Now" status label.
-- Alerts: compact live summary, ReliefWeb report cards, official feed cards, Lottie empty state.
+- Alerts: compact live summary, ReliefWeb report cards, official feed cards, Lottie empty state. Detailed view via `AlertDetailScreen` for specific hazard instructions and Radar focus.
 - Radar: full-screen native map, RainViewer radar overlay, software rain/wind/temp overlays, collapsible layer sidebar, autoplay timeline.
-- Ready: packed percentage, saved locations, go-bag progress, shelters, family plan.
+- Ready: packed percentage, saved locations, go-bag progress, evacuation centers via `SheltersScreen`, family plan.
 - Emergency: `SOS` tab, location-aware hotline directory, manual city search, dial-first cards.
 
 ## Navigation Direction
@@ -118,6 +143,12 @@ Purpose:
 - Disable a layer if its required data is unavailable rather than showing a fake static layer.
 - PAGASA public bulletins/files can be linked or summarized, but do not use them as a map tile/API source unless a stable documented endpoint is confirmed.
 - Windy can be used as UX inspiration for layer and timeline interaction, but do not depend on Windy paid layers or copy Windy branding.
+
+## Dev Infrastructure
+
+- **Development Build**: Transitioned from Expo Go to Development Builds using `expo-dev-client` to support native modules like `expo-notifications`.
+- **Native Identity**: Configured Android package name and iOS bundle identifier as `com.cathan.kalasag` in `app.json`.
+- **Deployment**: App requires a custom development client build for testing notification and location-aware features.
 
 ## Brand Assets
 

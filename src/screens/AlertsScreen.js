@@ -1,5 +1,5 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { AppState, FlatList, Image, Linking, RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
+import React, { useCallback, useMemo, useState } from 'react';
+import { FlatList, Image, Pressable, RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import { Chip, IconButton, Surface, useTheme } from 'react-native-paper';
@@ -8,7 +8,6 @@ import { useNetworkStatus } from '../hooks/useNetworkStatus';
 import EmptyState from '../components/EmptyState';
 import SkeletonLoader from '../components/SkeletonLoader';
 
-const REFRESH_INTERVAL_MS = 5 * 60 * 1000;
 const FILTERS = [
   { id: 'all', label: 'All', icon: 'apps-outline' },
   { id: 'weather', label: 'Weather', icon: 'rainy-outline' },
@@ -36,7 +35,7 @@ const relativeTime = (value) => {
   return days < 7 ? `${days}d ago` : date.toLocaleDateString();
 };
 
-const AlertsScreen = () => {
+const AlertsScreen = ({ navigation }) => {
   const theme = useTheme();
   const styles = useMemo(() => createStyles(theme), [theme]);
   const { alertsData, lastUpdated, isLoading, error, fetchAlerts } = useAlertsStore();
@@ -48,13 +47,6 @@ const AlertsScreen = () => {
     if (!isOffline) await fetchAlerts();
   }, [fetchAlerts, isOffline]);
 
-  useEffect(() => {
-    refreshAlerts();
-    const interval = setInterval(refreshAlerts, REFRESH_INTERVAL_MS);
-    const subscription = AppState.addEventListener('change', (state) => state === 'active' && refreshAlerts());
-    return () => { clearInterval(interval); subscription.remove(); };
-  }, [refreshAlerts]);
-
   const filteredAlerts = useMemo(() => (
     activeFilter === 'all' ? alerts : alerts.filter((alert) => alert.category === activeFilter)
   ), [activeFilter, alerts]);
@@ -65,12 +57,6 @@ const AlertsScreen = () => {
     setActiveFilter(id);
   };
 
-  const openSource = async (url) => {
-    if (!url || !(await Linking.canOpenURL(url))) return;
-    Haptics.selectionAsync();
-    await Linking.openURL(url);
-  };
-
   const severityTone = (severity) => {
     if (severity === 'Critical' || severity === 'High') return { color: theme.colors.error, icon: 'warning' };
     if (severity === 'Medium') return { color: theme.colors.warning, icon: 'alert-circle' };
@@ -79,31 +65,37 @@ const AlertsScreen = () => {
 
   const renderAlert = ({ item }) => {
     const tone = severityTone(item.severity);
-    const url = item.sourceUrl ?? item.url;
     return (
-      <Surface elevation={1} style={styles.alertCard}>
-        <View style={[styles.severityBar, { backgroundColor: tone.color }]} />
-        <View style={styles.alertBody}>
-          <View style={styles.metaRow}>
-            <View style={styles.sourceRow}>
-              <Ionicons name={CATEGORY_ICONS[item.category] ?? 'notifications-outline'} size={15} color={theme.colors.secondary} />
-              <Text style={styles.source} numberOfLines={1}>{item.source || 'Advisory'}</Text>
+      <Pressable
+        onPress={() => navigation.navigate('AlertDetails', { alertId: String(item.id), alert: item })}
+        accessibilityRole="button"
+        accessibilityLabel={`Open advisory: ${item.title}`}
+      >
+        <Surface elevation={1} style={styles.alertCard}>
+          <View style={[styles.severityBar, { backgroundColor: tone.color }]} />
+          <View style={styles.alertBody}>
+            <View style={styles.metaRow}>
+              <View style={styles.sourceRow}>
+                <Ionicons name={CATEGORY_ICONS[item.category] ?? 'notifications-outline'} size={15} color={theme.colors.secondary} />
+                <Text style={styles.source} numberOfLines={1}>{item.source || 'Advisory'}</Text>
+              </View>
+              <Text style={styles.time}>{relativeTime(item.publishedAt ?? item.timestamp)}</Text>
             </View>
-            <Text style={styles.time}>{relativeTime(item.publishedAt ?? item.timestamp)}</Text>
+            <View style={styles.titleRow}>
+              <Ionicons name={tone.icon} size={21} color={tone.color} />
+              <Text style={styles.alertTitle}>{item.title || 'Untitled advisory'}</Text>
+            </View>
+            {item.description ? <Text style={styles.description} numberOfLines={4}>{item.description}</Text> : null}
+            <View style={styles.footer}>
+              <Text style={[styles.severity, { color: tone.color }]}>{item.severity || 'Advisory'}</Text>
+              <View style={styles.detailLink}>
+                <Text style={styles.detailLinkText}>View details</Text>
+                <Ionicons name="chevron-forward" size={16} color={theme.colors.primary} />
+              </View>
+            </View>
           </View>
-          <View style={styles.titleRow}>
-            <Ionicons name={tone.icon} size={21} color={tone.color} />
-            <Text style={styles.alertTitle}>{item.title || 'Untitled advisory'}</Text>
-          </View>
-          {item.description ? <Text style={styles.description} numberOfLines={4}>{item.description}</Text> : null}
-          <View style={styles.footer}>
-            <Text style={[styles.severity, { color: tone.color }]}>{item.severity || 'Advisory'}</Text>
-            {url ? (
-              <Chip compact icon="open-in-new" onPress={() => openSource(url)} style={styles.sourceButton} textStyle={styles.sourceButtonText}>Source</Chip>
-            ) : null}
-          </View>
-        </View>
-      </Surface>
+        </Surface>
+      </Pressable>
     );
   };
 
@@ -125,7 +117,10 @@ const AlertsScreen = () => {
             <Text style={styles.subtitle}>{isOffline ? 'Saved alerts' : `Live · Updated ${relativeTime(lastUpdated)}`}</Text>
           </View>
         </View>
-        <IconButton icon="refresh" size={22} onPress={refreshAlerts} disabled={isLoading || isOffline} accessibilityLabel="Refresh alerts" />
+        <View style={styles.headerActions}>
+          <IconButton icon="bell-cog-outline" size={21} onPress={() => navigation.navigate('NotificationSettings')} accessibilityLabel="Notification settings" />
+          <IconButton icon="refresh" size={22} onPress={refreshAlerts} disabled={isLoading || isOffline} accessibilityLabel="Refresh alerts" />
+        </View>
       </View>
 
       {alerts.length ? (
@@ -201,6 +196,7 @@ const createStyles = (theme) => StyleSheet.create({
   headerContent: { gap: 14, marginBottom: 12 },
   header: { minHeight: 54, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   headerCopy: { flex: 1 },
+  headerActions: { flexDirection: 'row', alignItems: 'center' },
   screenTitle: { color: theme.colors.text.primary, fontSize: 30, lineHeight: 36, fontWeight: '700' },
   statusRow: { flexDirection: 'row', alignItems: 'center', gap: 7, marginTop: 3 },
   statusDot: { width: 7, height: 7, borderRadius: 4, backgroundColor: theme.colors.success },
@@ -236,8 +232,8 @@ const createStyles = (theme) => StyleSheet.create({
   description: { color: theme.colors.text.secondary, fontSize: 13, lineHeight: 20, marginTop: 10 },
   footer: { minHeight: 34, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 10 },
   severity: { fontSize: 11, fontWeight: '700', textTransform: 'uppercase' },
-  sourceButton: { backgroundColor: theme.colors.surfaceSoft },
-  sourceButtonText: { fontSize: 11 },
+  detailLink: { flexDirection: 'row', alignItems: 'center', gap: 2 },
+  detailLinkText: { color: theme.colors.primary, fontSize: 12, fontWeight: '700' },
 });
 
 export default AlertsScreen;

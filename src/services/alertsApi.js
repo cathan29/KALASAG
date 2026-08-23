@@ -34,6 +34,17 @@ const asArray = (value) => {
   return value == null ? [] : [value];
 };
 
+const cleanAreaList = (values) => ([...new Set(
+  asArray(values)
+    .flatMap((value) => typeof value === 'string' ? value.split(/[,;|]/) : [])
+    .map((value) => value.trim())
+    .filter(Boolean)
+)]);
+
+const getCapAffectedAreas = (areas) => cleanAreaList(
+  asArray(areas).map((area) => firstText(area?.areaDesc, area?.description))
+);
+
 const asPlainText = (value) => (
   typeof value === 'string'
     ? value.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim()
@@ -251,6 +262,7 @@ const normalizeGdacsFeature = (feature) => {
     sourceUrl,
     category: eventCategory(eventType),
     coordinates: isInsidePhilippines(coordinates) ? coordinates : null,
+    affectedAreas: cleanAreaList(firstText(properties.country, properties.countryname, properties.affectedcountries)),
   };
 };
 
@@ -277,6 +289,7 @@ const normalizeUsgsFeature = (feature) => {
     sourceUrl: firstText(properties.url) || 'https://earthquake.usgs.gov/',
     category: 'earthquake',
     coordinates,
+    affectedAreas: [place],
   };
 };
 
@@ -305,6 +318,8 @@ const normalizeOfficialAlert = (alert, index) => {
     sourceUrl: firstText(alert?.sourceUrl, alert?.url),
     category: firstText(alert?.category) || 'weather',
     coordinates,
+    affectedAreas: cleanAreaList(alert?.affectedAreas ?? alert?.areas ?? alert?.location),
+    instructions: asPlainText(firstText(alert?.instructions, alert?.instruction)),
   };
 };
 
@@ -334,6 +349,8 @@ const normalizePagasaCap = (entry, capDocument) => {
     sourceUrl: firstText(link, info.web, PAGASA_FEED_URL),
     category: /tsunami/i.test(firstText(info.event, info.headline)) ? 'tsunami' : 'weather',
     coordinates: getCapCoordinates(info.area),
+    affectedAreas: getCapAffectedAreas(info.area),
+    instructions: instruction,
   };
 };
 
@@ -373,6 +390,7 @@ const normalizeEonetEvent = (event) => {
     sourceUrl: firstText(source?.url, event.link, 'https://eonet.gsfc.nasa.gov/'),
     category,
     coordinates,
+    affectedAreas: cleanAreaList(firstText(event?.title, event?.categories?.[0]?.title)),
   };
 };
 
@@ -403,6 +421,8 @@ const normalizePtwcCap = (capDocument) => {
     sourceUrl: firstText(info.web, 'https://www.tsunami.gov/'),
     category: 'tsunami',
     coordinates: getCapCoordinates(info.area),
+    affectedAreas: getCapAffectedAreas(info.area),
+    instructions: asPlainText(firstText(info.instruction)),
   };
 };
 

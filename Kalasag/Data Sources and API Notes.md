@@ -61,6 +61,21 @@ Important:
 - PHIVOLCS' latest-earthquake page is official but currently HTML-only; keep it behind a server-side normalized adapter instead of brittle mobile scraping.
 - ReliefWeb is no longer the primary feed because API access requires a pre-approved app name.
 
+## OpenStreetMap (Overpass API)
+
+File: `src/services/sheltersApi.js`
+
+Current behavior:
+- Queries Overpass API for emergency-related tags within a specified radius of the user's location.
+- Targets `emergency=assembly_point`, `amenity=shelter` (of type emergency), `evacuation_center=yes`, and specific `social_facility` tags for disaster-displaced persons.
+- Uses a fallback endpoint system (e.g., `overpass-api.de` and `overpass.kumi.systems`) to ensure availability.
+- Normalizes OSM tags into a unified shelter schema: name, type, address, phone, capacity, and operator.
+- Includes direct links to OSM for data attribution and verification.
+
+Important:
+- Radius is capped at 50km to avoid API timeouts.
+- Results are cached in `useSheltersStore` to ensure the list remains available offline.
+
 ## Local Emergency Data
 
 File: `src/data/hotlines.json`

@@ -21,9 +21,17 @@
           "locationWhenInUsePermission": "Kalasag uses your location to show local weather, radar, and nearby disaster alerts."
         }
       ],
+      [
+        "expo-notifications",
+        {
+          "color": "#EF4444",
+          "defaultChannel": "critical-alerts"
+        }
+      ],
       "expo-font"
     ],
     "ios": {
+      "bundleIdentifier": "com.cathan.kalasag",
       "icon": "./assets/icon.png",
       "supportsTablet": true,
       "infoPlist": {
@@ -31,6 +39,7 @@
       }
     },
     "android": {
+      "package": "com.cathan.kalasag",
       "icon": "./assets/icon.png",
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",

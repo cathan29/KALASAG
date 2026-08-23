@@ -1,13 +1,23 @@
-import React, { useEffect } from 'react';
-import { StatusBar, StyleSheet, useColorScheme, View } from 'react-native';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { AppState, StatusBar, StyleSheet, useColorScheme, View } from 'react-native';
 import { DarkTheme, DefaultTheme, NavigationContainer } from '@react-navigation/native';
 import { PaperProvider } from 'react-native-paper';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import * as Location from 'expo-location';
 import AppNavigator from './src/navigation/AppNavigator';
+import SplashScreen from './src/screens/SplashScreen';
 import OfflineBanner from './src/components/OfflineBanner';
 import useWeatherStore from './src/store/useWeatherStore';
 import { createAppTheme } from './src/constants/theme';
+import { useAlertsStore } from './src/store/useAlertsStore';
+import useAlertNotifications from './src/hooks/useAlertNotifications';
+import { navigationRef } from './src/navigation/navigationRef';
+import {
+  getLastNotificationAlertId,
+  subscribeToNotificationResponses,
+} from './src/services/notificationService';
+
+const ALERT_REFRESH_INTERVAL_MS = 5 * 60 * 1000;
 
 const buildLocationLabel = (places) => {
   const place = places?.[0];
@@ -20,6 +30,7 @@ const buildLocationLabel = (places) => {
 };
 
 export default function App() {
+  const [showSplash, setShowSplash] = useState(true);
   const colorScheme = useColorScheme();
   const isDarkMode = colorScheme !== 'light';
   const appTheme = createAppTheme(isDarkMode);
@@ -30,6 +41,44 @@ export default function App() {
     setLocationPermissionStatus,
     setUserLocation,
   } = useWeatherStore();
+  const fetchAlerts = useAlertsStore((state) => state.fetchAlerts);
+  const pendingAlertIdRef = useRef(null);
+  useAlertNotifications();
+
+  const openAlert = useCallback((alertId) => {
+    if (!alertId) return;
+    if (navigationRef.isReady()) {
+      navigationRef.navigate('AlertDetails', { alertId: String(alertId) });
+    } else {
+      pendingAlertIdRef.current = String(alertId);
+    }
+  }, []);
+
+  const handleNavigationReady = useCallback(() => {
+    if (!pendingAlertIdRef.current) return;
+    const alertId = pendingAlertIdRef.current;
+    pendingAlertIdRef.current = null;
+    navigationRef.navigate('AlertDetails', { alertId });
+  }, []);
+
+  useEffect(() => {
+    fetchAlerts();
+    const interval = setInterval(fetchAlerts, ALERT_REFRESH_INTERVAL_MS);
+    const appStateSubscription = AppState.addEventListener('change', (state) => {
+      if (state === 'active') fetchAlerts();
+    });
+
+    return () => {
+      clearInterval(interval);
+      appStateSubscription.remove();
+    };
+  }, [fetchAlerts]);
+
+  useEffect(() => {
+    const subscription = subscribeToNotificationResponses(openAlert);
+    getLastNotificationAlertId().then(openAlert).catch(() => {});
+    return () => subscription.remove();
+  }, [openAlert]);
 
   useEffect(() => {
     const initializeLocation = async () => {
@@ -68,10 +117,16 @@ export default function App() {
     initializeLocation();
   }, []);
 
+  if (showSplash) {
+    return <SplashScreen onFinish={() => setShowSplash(false)} />;
+  }
+
   return (
     <SafeAreaProvider>
       <PaperProvider theme={appTheme}>
       <NavigationContainer
+        ref={navigationRef}
+        onReady={handleNavigationReady}
         theme={{
           ...(isDarkMode ? DarkTheme : DefaultTheme),
           colors: {

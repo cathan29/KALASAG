@@ -11,10 +11,14 @@
             "id": "95e4be03495a9b5a",
             "type": "leaf",
             "state": {
-              "type": "graph",
-              "state": {},
-              "icon": "lucide-git-fork",
-              "title": "Graph view"
+              "type": "markdown",
+              "state": {
+                "file": "System Status - 2026-08-21.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "System Status - 2026-08-21"
             }
           }
         ]
@@ -183,9 +187,10 @@
   },
   "active": "95e4be03495a9b5a",
   "lastOpenFiles": [
+    "System Status - 2026-08-24.md",
+    "Emergency Directory Logic.md",
     "Data Sources and API Notes.md",
     "Frontend Architecture.md",
-    "Emergency Directory Logic.md",
     "System Status - 2026-08-21.md",
     "Welcome.md"
   ]

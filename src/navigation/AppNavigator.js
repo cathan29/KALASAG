@@ -2,6 +2,7 @@ import React, { useMemo } from 'react';
 import { Platform, StyleSheet } from 'react-native';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { useTheme } from 'react-native-paper';
 
 import WeatherScreen from '../screens/WeatherScreen';
@@ -9,8 +10,12 @@ import AlertsScreen from '../screens/AlertsScreen';
 import MapScreen from '../screens/MapScreen';
 import PreparednessScreen from '../screens/PreparednessScreen';
 import EmergencyScreen from '../screens/EmergencyScreen';
+import AlertDetailScreen from '../screens/AlertDetailScreen';
+import NotificationSettingsScreen from '../screens/NotificationSettingsScreen';
+import SheltersScreen from '../screens/SheltersScreen';
 
 const Tab = createBottomTabNavigator();
+const Stack = createNativeStackNavigator();
 
 const TAB_LABELS = {
   Weather: 'Now',
@@ -36,7 +41,7 @@ const renderTabIcon = (routeName, focused, color, size) => {
   return <Ionicons name={focused ? 'call' : 'call-outline'} size={size} color={color} />;
 };
 
-const AppNavigator = () => {
+const MainTabs = () => {
   const theme = useTheme();
   const styles = useMemo(() => createStyles(theme), [theme]);
 
@@ -60,6 +65,25 @@ const AppNavigator = () => {
       <Tab.Screen name="Ready" component={PreparednessScreen} />
       <Tab.Screen name="Emergency" component={EmergencyScreen} />
     </Tab.Navigator>
+  );
+};
+
+const AppNavigator = () => {
+  const theme = useTheme();
+
+  return (
+    <Stack.Navigator
+      screenOptions={{
+        headerShown: false,
+        contentStyle: { backgroundColor: theme.colors.background },
+        animation: 'slide_from_right',
+      }}
+    >
+      <Stack.Screen name="MainTabs" component={MainTabs} />
+      <Stack.Screen name="AlertDetails" component={AlertDetailScreen} />
+      <Stack.Screen name="NotificationSettings" component={NotificationSettingsScreen} />
+      <Stack.Screen name="Shelters" component={SheltersScreen} />
+    </Stack.Navigator>
   );
 };
 

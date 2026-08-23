@@ -10,8 +10,9 @@ import { THEME } from '../constants/theme';
 import useWeatherStore from '../store/useWeatherStore';
 import GlassCard from '../components/GlassCard';
 
-const MapScreen = () => {
+const MapScreen = ({ route }) => {
   const { locationLabel, weatherData } = useWeatherStore();
+  const focusedAlertTitle = route?.params?.alertTitle;
   const temperature = Number.isFinite(Number(weatherData?.current?.temperature_2m))
     ? `${Math.round(Number(weatherData.current.temperature_2m))}°`
     : 'N/A';
@@ -33,7 +34,7 @@ const MapScreen = () => {
           <MaterialCommunityIcons name="radar" size={24} color={THEME.colors.secondary} />
           <View style={styles.hudTitleText}>
             <Text style={styles.hudTitle}>Radar</Text>
-            <Text style={styles.hudSubtitle} numberOfLines={1}>{locationLabel || 'Browser preview'}</Text>
+            <Text style={styles.hudSubtitle} numberOfLines={1}>{focusedAlertTitle || locationLabel || 'Browser preview'}</Text>
           </View>
         </View>
 
