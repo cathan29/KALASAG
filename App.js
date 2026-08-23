@@ -1,12 +1,13 @@
 import React, { useEffect } from 'react';
 import { StatusBar, StyleSheet, useColorScheme, View } from 'react-native';
 import { DarkTheme, DefaultTheme, NavigationContainer } from '@react-navigation/native';
+import { PaperProvider } from 'react-native-paper';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import * as Location from 'expo-location';
 import AppNavigator from './src/navigation/AppNavigator';
 import OfflineBanner from './src/components/OfflineBanner';
 import useWeatherStore from './src/store/useWeatherStore';
-import { THEME } from './src/constants/theme';
+import { createAppTheme } from './src/constants/theme';
 
 const buildLocationLabel = (places) => {
   const place = places?.[0];
@@ -21,6 +22,7 @@ const buildLocationLabel = (places) => {
 export default function App() {
   const colorScheme = useColorScheme();
   const isDarkMode = colorScheme !== 'light';
+  const appTheme = createAppTheme(isDarkMode);
   const {
     fetchWeather,
     setLocationError,
@@ -68,30 +70,33 @@ export default function App() {
 
   return (
     <SafeAreaProvider>
+      <PaperProvider theme={appTheme}>
       <NavigationContainer
         theme={{
           ...(isDarkMode ? DarkTheme : DefaultTheme),
           colors: {
             ...(isDarkMode ? DarkTheme.colors : DefaultTheme.colors),
-            background: THEME.colors.background,
-            card: THEME.colors.surface,
-            primary: THEME.colors.primary,
-            text: THEME.colors.text.primary,
+            background: appTheme.colors.background,
+            card: appTheme.colors.surface,
+            border: appTheme.colors.border,
+            primary: appTheme.colors.primary,
+            text: appTheme.colors.text.primary,
           },
         }}
       >
         <StatusBar
           barStyle={isDarkMode ? 'light-content' : 'dark-content'}
-          backgroundColor={THEME.colors.background}
+          backgroundColor={appTheme.colors.background}
           translucent={false}
         />
-        <SafeAreaView style={styles.safeArea} edges={['top']}>
+        <SafeAreaView style={[styles.safeArea, { backgroundColor: appTheme.colors.background }]} edges={['top']}>
           <OfflineBanner />
           <View style={styles.navigator}>
             <AppNavigator />
           </View>
         </SafeAreaView>
       </NavigationContainer>
+      </PaperProvider>
     </SafeAreaProvider>
   );
 }
@@ -99,7 +104,6 @@ export default function App() {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: THEME.colors.background,
   },
   navigator: {
     flex: 1,

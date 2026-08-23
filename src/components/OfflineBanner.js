@@ -1,32 +1,39 @@
-import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
-import { THEME } from '../constants/theme';
+import React, { useMemo } from 'react';
+import { StyleSheet, Text, View } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import { useTheme } from 'react-native-paper';
 import { useNetworkStatus } from '../hooks/useNetworkStatus';
 
 const OfflineBanner = () => {
   const isOffline = useNetworkStatus();
+  const theme = useTheme();
+  const styles = useMemo(() => createStyles(theme), [theme]);
 
   if (!isOffline) return null;
 
   return (
-    <View style={styles.banner}>
-      <Text style={styles.text}>Offline Mode: Showing last updated data.</Text>
+    <View style={styles.banner} accessibilityRole="alert">
+      <Ionicons name="cloud-offline-outline" size={16} color={theme.colors.text.inverse} />
+      <Text style={styles.text}>Offline · Showing saved data</Text>
     </View>
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (theme) => StyleSheet.create({
   banner: {
-    backgroundColor: THEME.colors.error,
-    padding: THEME.spacing.sm,
+    minHeight: 32,
+    backgroundColor: theme.colors.error,
+    paddingHorizontal: theme.spacing.md,
+    flexDirection: 'row',
+    gap: theme.spacing.sm,
     alignItems: 'center',
     justifyContent: 'center',
     zIndex: 1000,
   },
   text: {
-    color: THEME.colors.text.primary,
-    fontSize: 14,
-    fontWeight: 'bold',
+    color: theme.colors.text.inverse,
+    fontSize: 13,
+    fontWeight: '600',
     textAlign: 'center',
   },
 });

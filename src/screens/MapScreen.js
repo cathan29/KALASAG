@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import * as Location from 'expo-location';
+import * as Haptics from 'expo-haptics';
 import { LinearGradient } from 'expo-linear-gradient';
 import LottieView from 'lottie-react-native';
 import { WebView } from 'react-native-webview';
@@ -281,7 +282,10 @@ const MapScreen = () => {
           layers={WINDY_LAYERS}
           selectedOverlay={selectedOverlay}
           setIsOpen={setIsSidebarOpen}
-          setSelectedOverlay={setSelectedOverlay}
+          setSelectedOverlay={(overlay) => {
+            Haptics.selectionAsync();
+            setSelectedOverlay(overlay);
+          }}
         />
       ) : null}
 
@@ -291,7 +295,10 @@ const MapScreen = () => {
           isPlaying={isTimelinePlaying}
           selectedDayIndex={selectedDayIndex}
           selectedHour={selectedHour}
-          setIsPlaying={setIsTimelinePlaying}
+          setIsPlaying={(value) => {
+            Haptics.selectionAsync();
+            setIsTimelinePlaying(value);
+          }}
           setSelectedDayIndex={setSelectedDayIndex}
           setSelectedHour={setSelectedHour}
         />
@@ -566,8 +573,7 @@ const WindyLoadingState = () => {
           />
         </View>
 
-        <Text style={styles.loadingTitle}>Opening Live Weather Map</Text>
-        <Text style={styles.loadingSubtitle}>Loading Windy wind particles, sidebar menu, and forecast timeline.</Text>
+        <Text style={styles.loadingTitle}>Loading weather map</Text>
 
         <View style={styles.skeletonStack}>
           <SkeletonLine width="72%" translateX={translateX} />
@@ -609,20 +615,20 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 0,
     right: 0,
-    bottom: 286,
-    width: 184,
+    bottom: 210,
+    width: 164,
     alignItems: 'flex-end',
     justifyContent: 'center',
   },
   sidebarPanel: {
     ...THEME.shadows.card,
     maxHeight: '78%',
-    width: 172,
+    width: 154,
     paddingVertical: 8,
     paddingLeft: 7,
     paddingRight: 6,
-    borderTopLeftRadius: 20,
-    borderBottomLeftRadius: 20,
+    borderTopLeftRadius: 14,
+    borderBottomLeftRadius: 14,
     borderWidth: 1,
     borderRightWidth: 0,
     borderColor: THEME.colors.borderStrong,
@@ -684,7 +690,7 @@ const styles = StyleSheet.create({
     minHeight: 36,
   },
   layerLabel: {
-    maxWidth: 112,
+    maxWidth: 98,
     color: THEME.colors.text.primary,
     fontSize: 12,
     fontWeight: '800',
@@ -724,9 +730,9 @@ const styles = StyleSheet.create({
     position: 'absolute',
     left: 8,
     right: 8,
-    bottom: 92,
+    bottom: 10,
     paddingTop: 12,
-    borderRadius: 18,
+    borderRadius: 14,
     borderWidth: 1,
     borderColor: THEME.colors.borderStrong,
     backgroundColor: '#111827',
@@ -891,7 +897,7 @@ const styles = StyleSheet.create({
     ...THEME.shadows.card,
     width: '100%',
     maxWidth: 360,
-    borderRadius: 28,
+    borderRadius: 16,
     borderWidth: 1,
     borderColor: THEME.colors.borderStrong,
     padding: THEME.spacing.xl,
