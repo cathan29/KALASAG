@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo } from 'react';
-import { RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { AppState, RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { Surface, useTheme } from 'react-native-paper';
@@ -19,6 +19,8 @@ const weatherIconForCode = (code) => {
 const formatValue = (value, suffix = '') => (
   Number.isFinite(Number(value)) ? `${Math.round(Number(value))}${suffix}` : 'N/A'
 );
+
+const WEATHER_REFRESH_INTERVAL_MS = 10 * 60 * 1000;
 
 const buildRisk = ({ weatherCode, windSpeed, rain }) => {
   let score = 0;
@@ -41,20 +43,40 @@ const WeatherScreen = () => {
   const isOffline = useNetworkStatus();
 
   useEffect(() => {
-    if (userLocation && !weatherData) fetchWeather();
+    if (!userLocation) return undefined;
+    if (!weatherData) fetchWeather();
+
+    const interval = setInterval(fetchWeather, WEATHER_REFRESH_INTERVAL_MS);
+    const subscription = AppState.addEventListener('change', (state) => {
+      if (state === 'active') fetchWeather();
+    });
+
+    return () => {
+      clearInterval(interval);
+      subscription.remove();
+    };
   }, [userLocation, weatherData, fetchWeather]);
 
   const current = weatherData?.current ?? {};
   const hourly = weatherData?.hourly ?? {};
   const daily = weatherData?.daily ?? {};
+  const weatherMeta = weatherData?.weatherMeta ?? {};
   const nextHours = useMemo(() => (
-    (hourly.time ?? []).slice(0, 12).map((time, index) => ({
+    (() => {
+      const times = hourly.time ?? [];
+      const currentHour = String(current.time ?? '').slice(0, 13);
+      const currentIndex = Math.max(0, times.findIndex((time) => String(time).startsWith(currentHour)));
+      return times.slice(currentIndex, currentIndex + 12).map((time, offset) => {
+        const index = currentIndex + offset;
+        return {
       time,
       rainChance: hourly.precipitation_probability?.[index],
       temp: hourly.temperature_2m?.[index],
       code: hourly.weather_code?.[index],
-    }))
-  ), [hourly]);
+        };
+      });
+    })()
+  ), [current.time, hourly]);
 
   if ((isLoading || isLocating) && !weatherData) return <SkeletonLoader variant="weather" />;
   if (!weatherData && locationPermissionStatus === 'denied') {
@@ -111,6 +133,16 @@ const WeatherScreen = () => {
           <Text style={styles.updated}>{updatedAt ? `Updated ${updatedAt}` : 'Updating'}</Text>
         </View>
       </LinearGradient>
+
+      <View style={styles.sourceRow}>
+        <Ionicons name="git-compare-outline" size={16} color={theme.colors.secondary} />
+        <Text style={styles.sourceText} numberOfLines={1}>
+          {weatherMeta.modelCount
+            ? `Open-Meteo · ${weatherMeta.modelCount} models · ${weatherMeta.rainVotes}/${weatherMeta.modelCount} detect rain`
+            : 'Open-Meteo live forecast'}
+        </Text>
+        <Text style={styles.confidence}>{weatherMeta.confidence ?? 'Live'}</Text>
+      </View>
 
       <Surface elevation={1} style={styles.metrics}>
         <Metric icon="water-outline" label="Humidity" value={formatValue(current.relative_humidity_2m, '%')} theme={theme} styles={styles} />
@@ -184,6 +216,9 @@ const createStyles = (theme) => StyleSheet.create({
   riskRow: { flexDirection: 'row', alignItems: 'center', gap: 5, backgroundColor: 'rgba(0,0,0,0.18)', paddingHorizontal: 10, paddingVertical: 7, borderRadius: theme.borderRadius.full },
   risk: { fontSize: 12, fontWeight: '700' },
   updated: { flex: 1, color: 'rgba(255,255,255,0.72)', fontSize: 12, textAlign: 'right' },
+  sourceRow: { minHeight: 28, flexDirection: 'row', alignItems: 'center', gap: 7, paddingHorizontal: 3 },
+  sourceText: { flex: 1, color: theme.colors.text.secondary, fontSize: 12 },
+  confidence: { color: theme.colors.secondary, fontSize: 11, fontWeight: '700' },
   metrics: { flexDirection: 'row', minHeight: 104, paddingVertical: theme.spacing.md, backgroundColor: theme.colors.surface, borderRadius: theme.borderRadius.md, borderWidth: StyleSheet.hairlineWidth, borderColor: theme.colors.border },
   metric: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 4, paddingHorizontal: 5 },
   metricValue: { color: theme.colors.text.primary, fontSize: 16, fontWeight: '700', maxWidth: '100%' },
