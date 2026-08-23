@@ -12,6 +12,7 @@ import {
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import * as Location from 'expo-location';
 import { LinearGradient } from 'expo-linear-gradient';
+import LottieView from 'lottie-react-native';
 import { WebView } from 'react-native-webview';
 import { THEME } from '../constants/theme';
 
@@ -528,7 +529,6 @@ const WindyLayerSidebar = ({
 
 const WindyLoadingState = () => {
   const shimmer = useRef(new Animated.Value(-1)).current;
-  const pulse = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
     const shimmerLoop = Animated.loop(
@@ -539,52 +539,32 @@ const WindyLoadingState = () => {
         useNativeDriver: true,
       })
     );
-    const pulseLoop = Animated.loop(
-      Animated.sequence([
-        Animated.timing(pulse, {
-          toValue: 1,
-          duration: 900,
-          easing: Easing.out(Easing.ease),
-          useNativeDriver: true,
-        }),
-        Animated.timing(pulse, {
-          toValue: 0,
-          duration: 900,
-          easing: Easing.in(Easing.ease),
-          useNativeDriver: true,
-        }),
-      ])
-    );
-
     shimmerLoop.start();
-    pulseLoop.start();
 
     return () => {
       shimmerLoop.stop();
-      pulseLoop.stop();
     };
-  }, [pulse, shimmer]);
+  }, [shimmer]);
 
   const translateX = shimmer.interpolate({
     inputRange: [-1, 1],
     outputRange: [-220, 360],
   });
-  const scale = pulse.interpolate({
-    inputRange: [0, 1],
-    outputRange: [0.94, 1.08],
-  });
-
   return (
     <View style={styles.loadingOverlay}>
       <LinearGradient
         colors={['#0F172A', '#0F1B2E', '#08111F']}
         style={styles.loadingPanel}
       >
-        <Animated.View style={[styles.radarPulse, { transform: [{ scale }] }]}>
-          <View style={styles.radarRing}>
-            <MaterialCommunityIcons name="weather-windy" size={42} color={THEME.colors.secondary} />
-          </View>
-        </Animated.View>
+        <View style={styles.loadingAnimationFrame}>
+          <LottieView
+            source={require('../../assets/animations/loading.json')}
+            autoPlay
+            loop
+            resizeMode="contain"
+            style={styles.loadingAnimation}
+          />
+        </View>
 
         <Text style={styles.loadingTitle}>Opening Live Weather Map</Text>
         <Text style={styles.loadingSubtitle}>Loading Windy wind particles, sidebar menu, and forecast timeline.</Text>
@@ -918,25 +898,19 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     overflow: 'hidden',
   },
-  radarPulse: {
-    width: 112,
-    height: 112,
-    borderRadius: 56,
+  loadingAnimationFrame: {
+    width: 136,
+    height: 136,
+    borderRadius: 68,
     borderWidth: 1,
     borderColor: 'rgba(125, 211, 252, 0.26)',
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: 'rgba(59, 130, 246, 0.08)',
   },
-  radarRing: {
-    width: 76,
-    height: 76,
-    borderRadius: 38,
-    borderWidth: 1,
-    borderColor: THEME.colors.borderStrong,
-    backgroundColor: 'rgba(125, 211, 252, 0.1)',
-    alignItems: 'center',
-    justifyContent: 'center',
+  loadingAnimation: {
+    width: 120,
+    height: 120,
   },
   loadingTitle: {
     color: THEME.colors.text.primary,

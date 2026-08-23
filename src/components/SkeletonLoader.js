@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { Animated, Easing, StyleSheet, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import LottieView from 'lottie-react-native';
 import { THEME } from '../constants/theme';
 
 const SkeletonBlock = ({ width = '100%', height = 20, borderRadius = 12, style }) => {
@@ -43,6 +44,7 @@ const SkeletonLoader = ({ variant = 'weather' }) => {
   if (variant === 'list') {
     return (
       <View style={styles.stack}>
+        <LoadingAnimation />
         {[0, 1, 2].map((item) => (
           <View key={item} style={styles.card}>
             <SkeletonBlock width="62%" height={18} />
@@ -56,6 +58,7 @@ const SkeletonLoader = ({ variant = 'weather' }) => {
 
   return (
     <View style={styles.stack}>
+      <LoadingAnimation />
       <View style={styles.hero}>
         <SkeletonBlock width="42%" height={18} />
         <SkeletonBlock width="74%" height={34} style={styles.gap} />
@@ -70,6 +73,18 @@ const SkeletonLoader = ({ variant = 'weather' }) => {
   );
 };
 
+const LoadingAnimation = () => (
+  <View style={styles.loadingAnimationWrap}>
+    <LottieView
+      source={require('../../assets/animations/loading.json')}
+      autoPlay
+      loop
+      resizeMode="contain"
+      style={styles.loadingAnimation}
+    />
+  </View>
+);
+
 const styles = StyleSheet.create({
   stack: {
     flex: 1,
@@ -77,6 +92,15 @@ const styles = StyleSheet.create({
     gap: THEME.spacing.md,
     padding: THEME.spacing.md,
     paddingBottom: 116,
+  },
+  loadingAnimationWrap: {
+    height: 96,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  loadingAnimation: {
+    width: 96,
+    height: 96,
   },
   hero: {
     ...THEME.shadows.card,

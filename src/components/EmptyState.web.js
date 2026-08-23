@@ -1,19 +1,24 @@
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import LottieView from 'lottie-react-native';
 import { THEME } from '../constants/theme';
 
 const EmptyState = ({
   title = 'Walang naitalang sakuna ngayon. Ligtas ang araw!',
-  message = 'We will keep watching for updates.',
-  icon = 'shield-checkmark',
+  message,
 }) => (
   <View style={styles.card}>
-    <View style={styles.fallbackIcon}>
-      <Ionicons name={icon} size={36} color={THEME.colors.success} />
+    <View style={styles.animationWrap}>
+      <LottieView
+        source={require('../../assets/animations/safe-state.json')}
+        autoPlay
+        loop
+        resizeMode="contain"
+        style={styles.animation}
+      />
     </View>
     <Text style={styles.title}>{title}</Text>
-    <Text style={styles.message}>{message}</Text>
+    {message ? <Text style={styles.message}>{message}</Text> : null}
   </View>
 );
 
@@ -27,13 +32,15 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: THEME.colors.border,
   },
-  fallbackIcon: {
-    width: 78,
-    height: 78,
-    borderRadius: 39,
-    backgroundColor: 'rgba(34, 197, 94, 0.14)',
+  animationWrap: {
+    width: 200,
+    height: 200,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  animation: {
+    width: 200,
+    height: 200,
   },
   title: {
     color: THEME.colors.text.primary,

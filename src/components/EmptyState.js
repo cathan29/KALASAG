@@ -1,31 +1,24 @@
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import LottieView from 'lottie-react-native';
-import { Ionicons } from '@expo/vector-icons';
 import { THEME } from '../constants/theme';
-import safeDayAnimation from '../assets/lottie/safe-day.json';
 
 const EmptyState = ({
   title = 'Walang naitalang sakuna ngayon. Ligtas ang araw!',
-  message = 'We will keep watching for updates.',
-  animationSource = safeDayAnimation,
-  icon = 'shield-checkmark',
+  message,
 }) => (
   <View style={styles.card}>
     <View style={styles.animationWrap}>
       <LottieView
-        source={animationSource}
+        source={require('../../assets/animations/safe-state.json')}
         autoPlay
         loop
         resizeMode="contain"
         style={styles.animation}
       />
-      <View style={styles.fallbackIcon}>
-        <Ionicons name={icon} size={36} color={THEME.colors.success} />
-      </View>
     </View>
     <Text style={styles.title}>{title}</Text>
-    <Text style={styles.message}>{message}</Text>
+    {message ? <Text style={styles.message}>{message}</Text> : null}
   </View>
 );
 
@@ -40,24 +33,14 @@ const styles = StyleSheet.create({
     borderColor: THEME.colors.border,
   },
   animationWrap: {
-    width: 140,
-    height: 140,
+    width: 200,
+    height: 200,
     alignItems: 'center',
     justifyContent: 'center',
   },
   animation: {
-    width: 140,
-    height: 140,
-  },
-  fallbackIcon: {
-    position: 'absolute',
-    width: 66,
-    height: 66,
-    borderRadius: 33,
-    backgroundColor: 'rgba(34, 197, 94, 0.14)',
-    alignItems: 'center',
-    justifyContent: 'center',
-    zIndex: -1,
+    width: 200,
+    height: 200,
   },
   title: {
     color: THEME.colors.text.primary,

@@ -136,7 +136,6 @@ const AlertsScreen = () => {
         ListEmptyComponent={
           <EmptyState
             title="Walang naitalang sakuna ngayon. Ligtas ang araw!"
-            message="Safe day."
             icon="shield-checkmark"
           />
         }
