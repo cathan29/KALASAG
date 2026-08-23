@@ -8,6 +8,7 @@ The app has moved from a barebones Expo prototype into a more complete premium R
 - Added dynamic foreground location permission flow through `expo-location`.
 - Weather now uses actual GPS latitude and longitude.
 - Map centers on the user and overlays RainViewer radar tiles.
+- Radar map now uses the native map provider as the base map to avoid blocked OSM tile access.
 - Emergency screen now detects municipality through reverse geocoding and supports manual offline city search.
 - Added a mobile-native Preparedness tab for saved places, go-bag tracking, family plan notes, shelters, and official bulletin sources.
 - UI theme changed from pure black to deep navy/slate.
@@ -77,6 +78,24 @@ Current behavior:
 - Includes HUD with current temperature, hazard count, and radar status.
 - Lets the user switch recent RainViewer radar frames from the map HUD.
 - HUD labels were shortened to feel more like a native radar panel instead of a web dashboard.
+- New command-map sidebar supports Radar, Rain, Wind, Temp, and Alerts layers.
+- Sidebar can collapse into a compact handle.
+- Sidebar is centered vertically so map controls are easier to reach and do not feel pinned to the top.
+- Windy-style control pass separates layer selection and playback: layer controls stay in a centered right panel, while timeline/playback lives in a bottom bar.
+- Timeline can play/pause through radar frames or hourly Open-Meteo forecast frames, but playback starts paused by default.
+- Bottom timeline now shows frame label, current layer value, progress bar, frame count, and source label.
+- Top map info card now shows the selected layer, live source, current layer value, and two context metrics.
+- Users can tap anywhere on the map to drop an inspection pin and fetch an Open-Meteo point forecast for that coordinate.
+- Selected point card shows local temperature, condition, and wind for the tapped coordinate.
+- Rain, wind, and temperature are software visual overlays based on available hourly weather data.
+- Rain, wind, and temperature now show persistent on-map forecast pucks for hourly values such as rain chance, rain amount, humidity, wind speed, gusts, bearing, temperature, and sky state.
+- Map screen now fetches Open-Meteo forecast data when GPS is available but the weather store has no loaded hourly data yet.
+- Layer buttons now show their live source label and disable themselves when the required data is unavailable.
+- Radar source is RainViewer public Weather Maps API.
+- Rain, wind, and temperature sources are Open-Meteo hourly forecast fields.
+- PAGASA public files were reviewed, but no stable documented public tile/API layer was wired into the map.
+- Windy API was reviewed as a reference for layer/timeline behavior, but the app does not copy Windy branding or depend on paid Windy map layers.
+- Map style reads the phone color scheme and applies a dark native map style when the device is in dark mode.
 
 ### Preparedness
 
@@ -155,6 +174,7 @@ Notes:
 - `babel-preset-expo` is pinned to the Expo SDK 54 compatible version.
 - `GlassCard` wraps key panels with translucent styling, borders, sheen, and shadows so the UI feels polished without requiring native blur support.
 - `GlassCard`, `EmptyState`, and `MapScreen` include platform-aware fallbacks for unsupported preview environments.
+- `expo-blur` was removed because native blur views were not supported in the tested Expo Go runtime.
 
 ## Verification Already Run
 
@@ -168,6 +188,7 @@ Recent checks:
 - Glass UI pass was rechecked with `node --check` and `npx expo export --platform android --output-dir .expo-export-check --clear`.
 - Logo/fallback pass was rechecked with `node --check`, source scans for mojibake/unimplemented markers, and a successful Android Expo export.
 - Navbar spacing pass was rechecked with `node --check`, Android export, and web export.
+- Forecast map layer patch was rechecked with `node --check` and a successful Android Expo export.
 
 ## Known Constraints
 

@@ -84,7 +84,7 @@ Purpose:
 
 - Weather: large native hero card, risk summary, metric cards, hourly rain strip, short "Now" status label.
 - Alerts: compact live summary, ReliefWeb report cards, official feed cards, Lottie empty state.
-- Radar: full-screen map, OSM base tiles, RainViewer radar overlay, frame selector, compact HUD.
+- Radar: full-screen native map, RainViewer radar overlay, software rain/wind/temp overlays, collapsible layer sidebar, autoplay timeline.
 - Ready: packed percentage, saved locations, go-bag progress, shelters, family plan.
 - Emergency: `SOS` tab, location-aware hotline directory, manual city search, dial-first cards.
 
@@ -99,6 +99,25 @@ Purpose:
 - Blur and native-only UI must provide fallbacks for unsupported preview targets.
 - Active tab state should be an icon pill, not a full item background.
 - Current tab bar height is 76px with compact 10px labels and 40x30 icon pills.
+
+## Radar Map Direction
+
+- Use the native map provider as the base map; avoid depending on public OSM tile access for the base layer.
+- Radar layer uses RainViewer tile frames.
+- Rain, wind, and temperature layers are software overlays driven by Open-Meteo hourly data.
+- Non-radar forecast layers must show actual hourly values on the map through persistent data pucks, not only decorative tints or appearing/disappearing animation.
+- Controls live in a right-side collapsible panel.
+- Controls should be vertically centered for one-handed use.
+- Timeline starts paused; the user must tap play.
+- Timeline controls should live in a bottom bar, separate from the layer panel, following familiar weather-map app behavior.
+- Bottom timeline should show play/pause, frame label, layer value, progress, frame count, and source.
+- A visible info card should explain the active layer and expose useful values, not just show animation.
+- Map taps should drop an inspection pin and fetch a point forecast when online.
+- Map styling should follow `useColorScheme()` so dark-mode devices get dark map styling.
+- Layer buttons must represent real data sources and show source labels.
+- Disable a layer if its required data is unavailable rather than showing a fake static layer.
+- PAGASA public bulletins/files can be linked or summarized, but do not use them as a map tile/API source unless a stable documented endpoint is confirmed.
+- Windy can be used as UX inspiration for layer and timeline interaction, but do not depend on Windy paid layers or copy Windy branding.
 
 ## Brand Assets
 
@@ -125,3 +144,4 @@ Purpose:
 - Use glass selectively on panels and controls; avoid making every element frosted or the screen will look noisy.
 - Avoid raw unsupported native components in previews; use polished fallback cards instead.
 - Do not use `ExpoBlurView` in Expo Go unless the runtime is confirmed to support it.
+- Keep map controls compact enough for one-handed mobile use; avoid covering the user's location marker.

@@ -41,7 +41,7 @@ const buildWeatherUrl = ({ latitude, longitude }) => {
     latitude: String(latitude),
     longitude: String(longitude),
     current: 'temperature_2m,relative_humidity_2m,apparent_temperature,weather_code,wind_speed_10m,wind_direction_10m,precipitation',
-    hourly: 'temperature_2m,precipitation_probability,weather_code,wind_speed_10m',
+    hourly: 'temperature_2m,relative_humidity_2m,precipitation,precipitation_probability,weather_code,wind_speed_10m,wind_direction_10m,wind_gusts_10m',
     daily: 'weather_code,temperature_2m_max,temperature_2m_min,precipitation_sum,wind_speed_10m_max',
     timezone: 'auto',
     forecast_days: '3',
