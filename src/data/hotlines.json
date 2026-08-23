@@ -1,58 +1,319 @@
 {
   "default": {
-    "title": "National Emergency Hotlines",
+    "title": "Official National Emergency Hotlines",
+    "source": "https://ehotlines.e.gov.ph/",
+    "verifiedAt": "2026-08-23",
     "hotlines": {
       "emergency": "911",
       "red_cross": "143",
-      "ndrrmc": "02-8911-1406"
+      "ndrrmc": "02-8911-1406",
+      "pnp": "02-8722-0650",
+      "bfp": "02-8426-0219"
     }
   },
   "national": {
     "emergency": "911",
     "red_cross": "143",
-    "ndrrmc": "02-8911-1406"
+    "ndrrmc": "02-8911-1406",
+    "pnp": "02-8722-0650",
+    "bfp": "02-8426-0219"
   },
-  "regions": {
-    "NCR": {
-      "ndrrmc": "02-8911-1406",
-      "pnp": "02-8723-0401",
-      "bfp": "02-8527-3651",
-      "red_cross": "02-8527-0000"
-    },
-    "Luzon": {
-      "ndrrmc": "045-123-4567",
-      "pnp": "045-123-4568",
-      "bfp": "045-123-4569",
-      "red_cross": "045-123-4570"
-    },
-    "Visayas": {
-      "ndrrmc": "032-123-4567",
-      "pnp": "032-123-4568",
-      "bfp": "032-123-4569",
-      "red_cross": "032-123-4570"
-    },
-    "Mindanao": {
-      "ndrrmc": "082-123-4567",
-      "pnp": "082-123-4568",
-      "bfp": "082-123-4569",
-      "red_cross": "082-123-4570"
-    }
-  },
+  "regions": {},
   "municipalities": {
-    "Dagupan City": {
+    "City of Dagupan": {
       "province": "Pangasinan",
+      "verified": true,
+      "source": "https://www.dagupan.gov.ph/directories/",
+      "verifiedAt": "2026-08-23",
       "hotlines": {
-        "pnp_dagupan_city": "075-522-1234",
-        "bfp_dagupan_city": "075-522-2345",
-        "mdrrmo_dagupan_city": "075-522-3456"
+        "pnp_dagupan": "0916-525-6802",
+        "bfp_dagupan": "0917-184-2611",
+        "mdrrmo_dagupan": "0968-444-9598",
+        "health_office_dagupan": "0997-840-1377"
       }
     },
-    "Rosales": {
-      "province": "Pangasinan",
+    "Alitagtag": {
+      "province": "Batangas",
+      "verified": true,
+      "source": "https://www.alitagtag.gov.ph/government",
+      "verifiedAt": "2026-08-23",
       "hotlines": {
-        "pnp_rosales": "075-582-1234",
-        "bfp_rosales": "075-582-2345",
-        "mdrrmo_rosales": "075-582-3456"
+        "pnp_alitagtag": "043-772-3058",
+        "bfp_alitagtag": "0981-685-4771",
+        "mdrrmo_alitagtag": "0917-850-8183",
+        "health_office_alitagtag": "0929-378-0472"
+      }
+    },
+    "Compostela": {
+      "province": "Davao de Oro",
+      "verified": true,
+      "source": "https://davaodeoro.gov.ph/wp-content/uploads/2024/07/JAN-APRIL-2024-FINAL_compressed.pdf",
+      "verifiedAt": "2026-08-23",
+      "hotlines": {
+        "mdrrmo_compostela": "0910-469-5577"
+      }
+    },
+    "Laak": {
+      "province": "Davao de Oro",
+      "verified": true,
+      "source": "https://davaodeoro.gov.ph/wp-content/uploads/2024/07/JAN-APRIL-2024-FINAL_compressed.pdf",
+      "verifiedAt": "2026-08-23",
+      "hotlines": {
+        "mdrrmo_laak": "0998-591-4616"
+      }
+    },
+    "Mabini": {
+      "province": "Davao de Oro",
+      "verified": true,
+      "source": "https://davaodeoro.gov.ph/wp-content/uploads/2024/07/JAN-APRIL-2024-FINAL_compressed.pdf",
+      "verifiedAt": "2026-08-23",
+      "hotlines": {
+        "mdrrmo_mabini": "0945-184-4095"
+      }
+    },
+    "Maco": {
+      "province": "Davao de Oro",
+      "verified": true,
+      "source": "https://davaodeoro.gov.ph/wp-content/uploads/2024/07/JAN-APRIL-2024-FINAL_compressed.pdf",
+      "verifiedAt": "2026-08-23",
+      "hotlines": {
+        "mdrrmo_maco": "0953-840-1400"
+      }
+    },
+    "Maragusan": {
+      "province": "Davao de Oro",
+      "verified": true,
+      "source": "https://davaodeoro.gov.ph/wp-content/uploads/2024/07/JAN-APRIL-2024-FINAL_compressed.pdf",
+      "verifiedAt": "2026-08-23",
+      "hotlines": {
+        "mdrrmo_maragusan": "0912-383-5236"
+      }
+    },
+    "Mawab": {
+      "province": "Davao de Oro",
+      "verified": true,
+      "source": "https://davaodeoro.gov.ph/wp-content/uploads/2024/07/JAN-APRIL-2024-FINAL_compressed.pdf",
+      "verifiedAt": "2026-08-23",
+      "hotlines": {
+        "mdrrmo_mawab": "0951-093-4373"
+      }
+    },
+    "Monkayo": {
+      "province": "Davao de Oro",
+      "verified": true,
+      "source": "https://davaodeoro.gov.ph/wp-content/uploads/2024/07/JAN-APRIL-2024-FINAL_compressed.pdf",
+      "verifiedAt": "2026-08-23",
+      "hotlines": {
+        "mdrrmo_monkayo": "0907-207-8398"
+      }
+    },
+    "Montevista": {
+      "province": "Davao de Oro",
+      "verified": true,
+      "source": "https://davaodeoro.gov.ph/wp-content/uploads/2024/07/JAN-APRIL-2024-FINAL_compressed.pdf",
+      "verifiedAt": "2026-08-23",
+      "hotlines": {
+        "mdrrmo_montevista": "0950-190-1257"
+      }
+    },
+    "Nabunturan": {
+      "province": "Davao de Oro",
+      "verified": true,
+      "source": "https://davaodeoro.gov.ph/wp-content/uploads/2024/07/JAN-APRIL-2024-FINAL_compressed.pdf",
+      "verifiedAt": "2026-08-23",
+      "hotlines": {
+        "mdrrmo_nabunturan": "0946-246-1787"
+      }
+    },
+    "New Bataan": {
+      "province": "Davao de Oro",
+      "verified": true,
+      "source": "https://davaodeoro.gov.ph/wp-content/uploads/2024/07/JAN-APRIL-2024-FINAL_compressed.pdf",
+      "verifiedAt": "2026-08-23",
+      "hotlines": {
+        "mdrrmo_new_bataan": "0910-108-9731"
+      }
+    },
+    "Pantukan": {
+      "province": "Davao de Oro",
+      "verified": true,
+      "source": "https://davaodeoro.gov.ph/wp-content/uploads/2024/07/JAN-APRIL-2024-FINAL_compressed.pdf",
+      "verifiedAt": "2026-08-23",
+      "hotlines": {
+        "mdrrmo_pantukan": "0933-829-5331"
+      }
+    },
+    "Quezon City": {
+      "province": "",
+      "verified": true,
+      "sourceType": "official_facebook",
+      "source": "https://www.facebook.com/QCGov/posts/1096992105948761/",
+      "verifiedAt": "2026-08-23",
+      "hotlines": {
+        "mdrrmo_quezon_city": "122"
+      }
+    },
+    "Bula": {
+      "province": "Camarines Sur",
+      "verified": true,
+      "sourceType": "official_lgu_website",
+      "source": "https://municipalityofbula.gov.ph/updated-emergency-hotlines-bula-camarines-sur/",
+      "verifiedAt": "2026-08-23",
+      "hotlines": {
+        "pnp_bula": "0998-598-6010",
+        "bfp_bula": "0920-983-8905",
+        "mdrrmo_bula": "0920-949-9219",
+        "health_office_bula": "0948-569-2350"
+      }
+    },
+    "Alcoy": {
+      "province": "Cebu",
+      "verified": true,
+      "sourceType": "official_lgu_website",
+      "source": "https://alcoycebu.gov.ph/lgu-alcoy-coordination-meeting-for-tropical-storm-basyang/",
+      "verifiedAt": "2026-08-23",
+      "hotlines": {
+        "pnp_alcoy": "0998-598-6346",
+        "bfp_alcoy": "0962-923-5629",
+        "mdrrmo_alcoy": "0962-157-3117",
+        "health_office_alcoy": "0945-293-8773"
+      }
+    },
+    "Santa Maria": {
+      "province": "Pangasinan",
+      "verified": true,
+      "sourceType": "official_lgu_website",
+      "source": "https://lgustamaria-pangasinan.com/contact-us/",
+      "verifiedAt": "2026-08-23",
+      "hotlines": {
+        "pnp_santa_maria": "0998-598-5144",
+        "bfp_santa_maria": "0917-187-9611",
+        "mdrrmo_santa_maria": "0921-558-9033",
+        "health_office_santa_maria": "075-523-3773"
+      }
+    },
+    "Buenavista": {
+      "province": "Agusan del Norte",
+      "verified": true,
+      "sourceType": "official_lgu_website",
+      "source": "https://buenavista.gov.ph/contact-us/",
+      "verifiedAt": "2026-08-23",
+      "hotlines": {
+        "pnp_buenavista": "0998-598-7275",
+        "bfp_buenavista": "0930-619-1171",
+        "mdrrmo_buenavista": "0951-800-5417",
+        "health_office_buenavista": "0951-382-5759"
+      }
+    },
+    "Balamban": {
+      "province": "Cebu",
+      "verified": true,
+      "sourceType": "official_lgu_website",
+      "source": "https://balambancebu.gov.ph/%F0%9F%93%A2-advisory-mdrrmo/",
+      "verifiedAt": "2026-08-23",
+      "hotlines": {
+        "mdrrmo_balamban": "0947-861-2147"
+      }
+    },
+    "City of San Fernando": {
+      "province": "La Union",
+      "verified": true,
+      "sourceType": "official_lgu_website",
+      "source": "https://www.sanfernandocity.gov.ph/wp-content/uploads/2023/06/City-of-San-Fernando-LU-Final-1.pdf",
+      "verifiedAt": "2026-08-23",
+      "hotlines": {
+        "pnp_san_fernando": "0915-558-8888",
+        "bfp_san_fernando": "0917-183-8711",
+        "mdrrmo_san_fernando": "0917-676-7673",
+        "health_office_san_fernando": "0945-822-2735"
+      }
+    },
+    "Lopez": {
+      "province": "Quezon",
+      "verified": true,
+      "sourceType": "official_lgu_website",
+      "source": "https://livelopez.gov.ph/offices/municipal-health-office/",
+      "verifiedAt": "2026-08-23",
+      "hotlines": {
+        "pnp_lopez": "0908-489-8918",
+        "bfp_lopez": "0930-327-1448",
+        "mdrrmo_lopez": "0909-341-0636",
+        "health_office_lopez": "0970-828-3554"
+      }
+    },
+    "Bansalan": {
+      "province": "Davao del Sur",
+      "verified": true,
+      "sourceType": "official_lgu_website",
+      "source": "https://bansalan.gov.ph/emergency-contact-hotlines/",
+      "verifiedAt": "2026-08-23",
+      "hotlines": {
+        "pnp_bansalan": "0963-055-8375",
+        "bfp_bansalan": "0949-821-8200",
+        "mdrrmo_bansalan": "0981-524-3940",
+        "health_office_bansalan": "0964-759-5567"
+      }
+    },
+    "Mamburao": {
+      "province": "Occidental Mindoro",
+      "verified": true,
+      "sourceType": "official_lgu_website",
+      "source": "https://mamburao.gov.ph/local-disaster-risk-reduction-and-management-section/page/2/",
+      "verifiedAt": "2026-08-23",
+      "hotlines": {
+        "pnp_mamburao": "0998-598-5839",
+        "bfp_mamburao": "0945-726-4206",
+        "mdrrmo_mamburao": "0977-337-9723",
+        "health_office_mamburao": "0956-478-1967"
+      }
+    },
+    "Nabas": {
+      "province": "Aklan",
+      "verified": true,
+      "sourceType": "official_lgu_website",
+      "source": "https://www.nabas.gov.ph/",
+      "verifiedAt": "2026-08-23",
+      "hotlines": {
+        "pnp_nabas": "0998-598-6124",
+        "bfp_nabas": "0931-779-6613",
+        "mdrrmo_nabas": "0921-460-5082"
+      }
+    },
+    "City of Ilagan": {
+      "province": "Isabela",
+      "verified": true,
+      "sourceType": "official_lgu_website",
+      "source": "https://cityofilagan.gov.ph/index.php/emergency-hotlines/",
+      "verifiedAt": "2026-08-23",
+      "hotlines": {
+        "mdrrmo_ilagan": "0915-234-1124",
+        "health_office_ilagan": "0977-463-8785"
+      }
+    },
+    "City of Tacurong": {
+      "province": "Sultan Kudarat",
+      "verified": true,
+      "sourceType": "official_lgu_website",
+      "source": "https://tacurong.gov.ph/contact-us/",
+      "verifiedAt": "2026-08-23",
+      "hotlines": {
+        "pnp_tacurong": "0918-392-7266",
+        "bfp_tacurong": "0912-193-0047",
+        "mdrrmo_tacurong": "0953-085-1890",
+        "health_office_tacurong": "0977-862-0002"
+      }
+    },
+    "Floridablanca": {
+      "province": "Pampanga",
+      "verified": true,
+      "sourceType": "official_lgu_website",
+      "source": "https://www.floridablanca.gov.ph/floridablanca-24-7-emergency-hotlines/",
+      "verifiedAt": "2026-08-23",
+      "hotlines": {
+        "pnp_floridablanca": "0998-598-5453",
+        "bfp_floridablanca": "0946-923-4836",
+        "mdrrmo_floridablanca": "0962-126-6282",
+        "health_office_floridablanca": "0962-993-6167"
       }
     }
   }
