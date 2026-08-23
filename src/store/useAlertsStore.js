@@ -5,13 +5,15 @@ import { fetchDisasters } from '../services/alertsApi';
 
 export const useAlertsStore = create(
   persist(
-    (set) => ({
+    (set, get) => ({
       alertsData: null,
       lastUpdated: null,
       isLoading: false,
       error: null,
 
       fetchAlerts: async () => {
+        if (get().isLoading) return false;
+
         set({ isLoading: true, error: null });
         try {
           const disasters = await fetchDisasters();
@@ -21,18 +23,23 @@ export const useAlertsStore = create(
             isLoading: false,
             error: null,
           });
+          return true;
         } catch (error) {
           set({
             isLoading: false,
-            error: error.message || 'Failed to fetch alerts',
+            error: error.message || 'Unable to refresh live alerts.',
           });
-          // The persist middleware automatically maintains the existing alertsData in the state
+          return false;
         }
       },
     }),
     {
       name: 'alerts-storage',
       storage: createJSONStorage(() => AsyncStorage),
+      partialize: (state) => ({
+        alertsData: state.alertsData,
+        lastUpdated: state.lastUpdated,
+      }),
     }
   )
 );

@@ -2,6 +2,7 @@ export const CONFIG = {
   api: {
     baseUrl: process.env.REACT_APP_API_BASE_URL || 'https://api.kalasag.io/v1',
     reliefWebAppName: process.env.EXPO_PUBLIC_RELIEFWEB_APP_NAME || 'kalasag',
+    officialAlertsUrl: process.env.EXPO_PUBLIC_ALERTS_FEED_URL || '',
     timeout: 10000,
     retryAttempts: 3,
   },

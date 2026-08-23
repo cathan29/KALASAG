@@ -20,7 +20,8 @@
         {
           "locationWhenInUsePermission": "Kalasag uses your location to show local weather, radar, and nearby disaster alerts."
         }
-      ]
+      ],
+      "expo-font"
     ],
     "ios": {
       "icon": "./assets/icon.png",
