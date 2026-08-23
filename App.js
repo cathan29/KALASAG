@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
-import { StatusBar, useColorScheme } from 'react-native';
+import { StatusBar, StyleSheet, useColorScheme, View } from 'react-native';
 import { DarkTheme, DefaultTheme, NavigationContainer } from '@react-navigation/native';
+import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import * as Location from 'expo-location';
 import AppNavigator from './src/navigation/AppNavigator';
 import OfflineBanner from './src/components/OfflineBanner';
@@ -66,24 +67,41 @@ export default function App() {
   }, []);
 
   return (
-    <NavigationContainer
-      theme={{
-        ...(isDarkMode ? DarkTheme : DefaultTheme),
-        colors: {
-          ...(isDarkMode ? DarkTheme.colors : DefaultTheme.colors),
-          background: THEME.colors.background,
-          card: THEME.colors.surface,
-          primary: THEME.colors.primary,
-          text: THEME.colors.text.primary,
-        },
-      }}
-    >
-      <StatusBar
-        barStyle={isDarkMode ? 'light-content' : 'dark-content'}
-        backgroundColor={THEME.colors.background}
-      />
-      <OfflineBanner />
-      <AppNavigator />
-    </NavigationContainer>
+    <SafeAreaProvider>
+      <NavigationContainer
+        theme={{
+          ...(isDarkMode ? DarkTheme : DefaultTheme),
+          colors: {
+            ...(isDarkMode ? DarkTheme.colors : DefaultTheme.colors),
+            background: THEME.colors.background,
+            card: THEME.colors.surface,
+            primary: THEME.colors.primary,
+            text: THEME.colors.text.primary,
+          },
+        }}
+      >
+        <StatusBar
+          barStyle={isDarkMode ? 'light-content' : 'dark-content'}
+          backgroundColor={THEME.colors.background}
+          translucent={false}
+        />
+        <SafeAreaView style={styles.safeArea} edges={['top']}>
+          <OfflineBanner />
+          <View style={styles.navigator}>
+            <AppNavigator />
+          </View>
+        </SafeAreaView>
+      </NavigationContainer>
+    </SafeAreaProvider>
   );
 }
+
+const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: THEME.colors.background,
+  },
+  navigator: {
+    flex: 1,
+  },
+});
