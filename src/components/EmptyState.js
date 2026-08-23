@@ -1,7 +1,6 @@
 import React, { useMemo } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { Image, StyleSheet, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import LottieView from 'lottie-react-native';
 import { useTheme } from 'react-native-paper';
 
 const STATE_ICONS = {
@@ -21,14 +20,14 @@ const EmptyState = ({
   return (
     <View style={styles.container}>
       {variant === 'safe' ? (
-        <LottieView
-          source={require('@meteocons/lottie/fill/clear-day.json')}
-          autoPlay
-          loop
-          speed={0.7}
-          resizeMode="contain"
-          style={styles.animation}
-        />
+        <View style={styles.mascotFrame}>
+          <Image
+            source={require('../../assets/mascot/kalasag-safe.png')}
+            resizeMode="cover"
+            style={styles.mascot}
+            accessibilityIgnoresInvertColors
+          />
+        </View>
       ) : (
         <View style={[styles.iconShell, variant === 'error' && styles.errorShell]}>
           <Ionicons
@@ -52,7 +51,16 @@ const createStyles = (theme) => StyleSheet.create({
     paddingHorizontal: theme.spacing.lg,
     paddingVertical: theme.spacing.xl,
   },
-  animation: { width: 112, height: 112 },
+  mascotFrame: {
+    width: 168,
+    height: 168,
+    borderRadius: 84,
+    overflow: 'hidden',
+    backgroundColor: '#1E293B',
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: theme.colors.borderStrong,
+  },
+  mascot: { width: '100%', height: '100%' },
   iconShell: {
     width: 72,
     height: 72,

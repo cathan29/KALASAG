@@ -32,6 +32,8 @@ const useWeatherStore = create(
       }),
 
       fetchWeather: async (locationOverride) => {
+        if (get().isLoading) return false;
+
         const location = locationOverride ?? get().userLocation;
 
         if (!location) {
@@ -39,7 +41,7 @@ const useWeatherStore = create(
             isLoading: false,
             error: 'Allow location access to load local weather.',
           });
-          return;
+          return false;
         }
 
         set({ isLoading: true, error: null });
@@ -60,11 +62,13 @@ const useWeatherStore = create(
             isLoading: false,
             error: null,
           });
+          return true;
         } catch (err) {
           set({
             isLoading: false,
             error: err instanceof Error ? err.message : 'An unknown error occurred while fetching weather',
           });
+          return false;
         }
       },
     }),

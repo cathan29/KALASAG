@@ -38,7 +38,7 @@ const weatherCodeFromConsensus = (codes, precipitation, fallbackCode) => {
   const requiredVotes = Math.max(2, Math.ceil(codes.length / 2));
 
   if (thunderVotes >= requiredVotes) return 95;
-  if (rainVotes >= requiredVotes && precipitation >= 0.1) {
+  if (rainVotes >= requiredVotes) {
     if (precipitation >= 7.5) return 65;
     if (precipitation >= 2.5) return 63;
     if (precipitation >= 0.5) return 61;
@@ -114,12 +114,14 @@ const normalizeWeatherData = (data, location) => {
   const consensusPrecipitation = median(modelRain) ?? 0;
   const directPrecipitation = asNumberOrNull(rawCurrent.precipitation) ?? 0;
   const directRain = RAIN_CODES.has(rawCurrent.weather_code) || directPrecipitation >= 0.1;
-  const consensusRain = rainVotes >= requiredVotes && consensusPrecipitation >= 0.1;
+  const consensusRain = rainVotes >= requiredVotes;
   const shouldOverrideRain = !directRain && consensusRain;
   const weatherCode = shouldOverrideRain
     ? weatherCodeFromConsensus(modelCodes, consensusPrecipitation, rawCurrent.weather_code)
     : asNumberOrNull(rawCurrent.weather_code);
-  const precipitation = shouldOverrideRain ? consensusPrecipitation : directPrecipitation;
+  const precipitation = shouldOverrideRain
+    ? Math.max(consensusPrecipitation, directPrecipitation)
+    : directPrecipitation;
   const temperature = asNumberOrNull(rawCurrent.temperature_2m);
   const apparentTemperature = asNumberOrNull(rawCurrent.apparent_temperature);
   const humidity = asNumberOrNull(rawCurrent.relative_humidity_2m);

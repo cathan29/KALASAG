@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Image, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import { Button, Checkbox, IconButton, ProgressBar, Surface, TextInput, TouchableRipple, useTheme } from 'react-native-paper';
@@ -34,12 +34,20 @@ const PreparednessScreen = () => {
       </View>
 
       <Surface elevation={1} style={styles.progressCard}>
+        <View style={styles.progressMedia} pointerEvents="none">
+          <Image
+            source={require('../../assets/mascot/kalasag-ready.png')}
+            resizeMode="cover"
+            style={styles.progressMascot}
+            accessibilityIgnoresInvertColors
+          />
+        </View>
+        <View style={styles.progressShade} />
         <View style={styles.progressTop}>
           <View>
             <Text style={styles.progressLabel}>Go-bag progress</Text>
             <Text style={styles.progressValue}>{Math.round(completion * 100)}%</Text>
           </View>
-          <Ionicons name="shield-checkmark-outline" size={31} color={completion === 1 ? theme.colors.success : theme.colors.primary} />
         </View>
         <ProgressBar progress={completion} color={completion === 1 ? theme.colors.success : theme.colors.primary} style={styles.progress} />
         <Text style={styles.progressMeta}>{completedCount} of {kitItems.length} essentials packed</Text>
@@ -108,12 +116,15 @@ const createStyles = (theme) => StyleSheet.create({
   content: { paddingHorizontal: theme.spacing.md, paddingTop: 18, paddingBottom: theme.spacing.lg, gap: 14 },
   title: { color: theme.colors.text.primary, fontSize: 30, lineHeight: 36, fontWeight: '700' },
   subtitle: { color: theme.colors.text.secondary, fontSize: 14, marginTop: 2 },
-  progressCard: { backgroundColor: theme.colors.surface, borderRadius: theme.borderRadius.md, padding: theme.spacing.md, borderWidth: StyleSheet.hairlineWidth, borderColor: theme.colors.border },
+  progressCard: { minHeight: 176, backgroundColor: '#1E293B', borderRadius: theme.borderRadius.lg, padding: theme.spacing.md, borderWidth: StyleSheet.hairlineWidth, borderColor: theme.colors.borderStrong, overflow: 'hidden', justifyContent: 'flex-end' },
+  progressMedia: { ...StyleSheet.absoluteFillObject },
+  progressMascot: { width: '100%', height: '100%' },
+  progressShade: { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(7,18,35,0.34)' },
   progressTop: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
-  progressLabel: { color: theme.colors.text.secondary, fontSize: 13 },
-  progressValue: { color: theme.colors.text.primary, fontSize: 30, lineHeight: 36, fontWeight: '700', marginTop: 2 },
-  progress: { height: 7, borderRadius: 4, marginTop: 13 },
-  progressMeta: { color: theme.colors.text.muted, fontSize: 12, marginTop: 8 },
+  progressLabel: { color: 'rgba(255,255,255,0.76)', fontSize: 13 },
+  progressValue: { color: '#FFFFFF', fontSize: 34, lineHeight: 40, fontWeight: '700', marginTop: 2 },
+  progress: { width: '52%', height: 7, borderRadius: 4, marginTop: 13, backgroundColor: 'rgba(255,255,255,0.18)' },
+  progressMeta: { width: '54%', color: 'rgba(255,255,255,0.72)', fontSize: 12, marginTop: 8 },
   sectionHeader: { minHeight: 30, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 5 },
   sectionTitle: { color: theme.colors.text.primary, fontSize: 19, fontWeight: '700' },
   sectionAction: { color: theme.colors.text.muted, fontSize: 13, fontVariant: ['tabular-nums'] },

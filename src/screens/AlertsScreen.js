@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { AppState, FlatList, Linking, RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { AppState, FlatList, Image, Linking, RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import { Chip, IconButton, Surface, useTheme } from 'react-native-paper';
@@ -128,7 +128,24 @@ const AlertsScreen = () => {
         <IconButton icon="refresh" size={22} onPress={refreshAlerts} disabled={isLoading || isOffline} accessibilityLabel="Refresh alerts" />
       </View>
 
-      <Text style={styles.summary}>{alerts.length} active {alerts.length === 1 ? 'report' : 'reports'}{urgentCount ? ` · ${urgentCount} urgent` : ''}</Text>
+      {alerts.length ? (
+        <View style={styles.mascotSummary}>
+          <View style={styles.mascotSummaryMedia} pointerEvents="none">
+            <Image
+              source={require('../../assets/mascot/kalasag-alert.png')}
+              resizeMode="cover"
+              style={styles.mascotSummaryImage}
+              accessibilityIgnoresInvertColors
+            />
+          </View>
+          <View style={styles.mascotSummaryShade} />
+          <View style={styles.mascotSummaryCopy}>
+            <Text style={styles.mascotEyebrow}>MONITORING</Text>
+            <Text style={styles.mascotSummaryTitle}>{alerts.length} active {alerts.length === 1 ? 'report' : 'reports'}</Text>
+            <Text style={styles.mascotSummaryMeta}>{urgentCount ? `${urgentCount} need immediate attention` : 'No high-priority advisory'}</Text>
+          </View>
+        </View>
+      ) : null}
       {error && alerts.length > 0 ? <Text style={styles.warning}>Saved alerts shown. Refresh will retry automatically.</Text> : null}
 
       <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.filters}>
@@ -180,7 +197,14 @@ const createStyles = (theme) => StyleSheet.create({
   statusDot: { width: 7, height: 7, borderRadius: 4, backgroundColor: theme.colors.success },
   offlineDot: { backgroundColor: theme.colors.text.disabled },
   subtitle: { color: theme.colors.text.muted, fontSize: 12 },
-  summary: { color: theme.colors.text.secondary, fontSize: 15, fontWeight: '600' },
+  mascotSummary: { minHeight: 126, borderRadius: theme.borderRadius.lg, overflow: 'hidden', backgroundColor: '#1E293B', borderWidth: StyleSheet.hairlineWidth, borderColor: theme.colors.borderStrong, justifyContent: 'center' },
+  mascotSummaryMedia: { ...StyleSheet.absoluteFillObject },
+  mascotSummaryImage: { width: '100%', height: '100%' },
+  mascotSummaryShade: { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(7,18,35,0.34)' },
+  mascotSummaryCopy: { width: '52%', padding: theme.spacing.md },
+  mascotEyebrow: { color: theme.colors.secondary, fontSize: 10, fontWeight: '800' },
+  mascotSummaryTitle: { color: '#FFFFFF', fontSize: 22, lineHeight: 27, fontWeight: '700', marginTop: 3 },
+  mascotSummaryMeta: { color: 'rgba(255,255,255,0.72)', fontSize: 11, lineHeight: 16, marginTop: 5 },
   warning: { color: theme.colors.warning, fontSize: 12, lineHeight: 18 },
   filters: { gap: 7, paddingRight: theme.spacing.md },
   filter: { backgroundColor: theme.colors.surface, borderWidth: StyleSheet.hairlineWidth, borderColor: theme.colors.border },
