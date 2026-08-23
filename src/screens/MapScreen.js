@@ -22,7 +22,7 @@ const MANILA_COORDINATE = {
   longitude: 120.9842,
 };
 
-const WINDY_BASE_URL = 'https://embed.windy.com/embed2.html';
+const WINDY_BASE_URL = 'https://embed.windy.com/embed.html';
 const FORECAST_DAY_COUNT = 5;
 const FORECAST_HOURS = Array.from({ length: 24 }, (_, index) => index);
 
@@ -37,8 +37,15 @@ const WINDY_LAYERS = [
   { label: 'Waves', overlay: 'waves', icon: 'waves' },
   { label: 'Rain accumulation', overlay: 'rainAccu', icon: 'weather-rainy' },
   { label: 'Thunderstorms', overlay: 'thunder', icon: 'weather-lightning-rainy' },
-  { label: 'Altitude', overlay: 'wind', icon: 'airplane' },
+  { label: 'Freezing level', overlay: 'deg0', icon: 'airplane' },
 ];
+
+const productForOverlay = (overlay) => {
+  if (overlay === 'radar') return 'radar';
+  if (overlay === 'satellite') return 'satellite';
+  if (overlay === 'waves') return 'ecmwfWaves';
+  return 'ecmwf';
+};
 
 const getForecastTimestamp = (dayIndex, hour) => {
   const now = new Date();
@@ -49,16 +56,16 @@ const getForecastTimestamp = (dayIndex, hour) => {
   return target.getTime();
 };
 
-const buildWindyUrl = ({ latitude, longitude }) => {
+const buildWindyUrl = ({ latitude, longitude, zoom = 10 }, overlay = 'wind') => {
   const params = new URLSearchParams({
     lat: String(latitude),
     lon: String(longitude),
     detailLat: String(latitude),
     detailLon: String(longitude),
-    zoom: '10',
+    zoom: String(Math.max(3, Math.min(18, Math.round(zoom)))),
     level: 'surface',
-    overlay: 'wind',
-    product: 'ecmwf',
+    overlay,
+    product: productForOverlay(overlay),
     menu: 'true',
     message: 'false',
     marker: 'true',
@@ -91,13 +98,14 @@ const WINDY_BRIDGE_SCRIPT = `
     }
 
     const applyWeatherState = (payload) => {
-      const store = window.W && window.W.store;
+      const store = (window.windyAPI && window.windyAPI.store) ||
+        (window.W && window.W.store);
       if (!store || typeof store.set !== 'function') {
         window.__kalasagPendingWeather = payload;
         return false;
       }
 
-      if (payload.overlay) store.set('overlay', payload.overlay);
+      if (payload.overlay) store.set('overlay', payload.overlay, { forceChange: true });
       if (Number.isFinite(payload.timestamp)) store.set('timestamp', payload.timestamp);
       window.__kalasagPendingWeather = null;
       return true;
@@ -105,12 +113,42 @@ const WINDY_BRIDGE_SCRIPT = `
 
     window.__kalasagSetWeather = applyWeatherState;
 
+    const getWindyMap = () =>
+      (window.windyAPI && window.windyAPI.map) ||
+      (window.W && window.W.map) ||
+      null;
+
     const waitForWindy = setInterval(() => {
       if (window.__kalasagPendingWeather && applyWeatherState(window.__kalasagPendingWeather)) {
         clearInterval(waitForWindy);
       }
     }, 350);
     setTimeout(() => clearInterval(waitForWindy), 30000);
+
+    const publishViewport = () => {
+      const map = getWindyMap();
+      if (!map || typeof map.getCenter !== 'function' || typeof map.getZoom !== 'function') {
+        return false;
+      }
+
+      const center = map.getCenter();
+      window.ReactNativeWebView.postMessage(JSON.stringify({
+        type: 'viewport',
+        latitude: center.lat,
+        longitude: center.lng,
+        zoom: map.getZoom(),
+      }));
+      return true;
+    };
+
+    const bindViewport = setInterval(() => {
+      const map = getWindyMap();
+      if (!map || typeof map.on !== 'function') return;
+      map.on('moveend zoomend', publishViewport);
+      publishViewport();
+      clearInterval(bindViewport);
+    }, 350);
+    setTimeout(() => clearInterval(bindViewport), 30000);
   })();
   true;
 `;
@@ -137,7 +175,9 @@ const formatHour = (hour) => {
 
 const MapScreen = () => {
   const webViewRef = useRef(null);
+  const viewportRef = useRef(null);
   const [coordinate, setCoordinate] = useState(null);
+  const [windyUrl, setWindyUrl] = useState(null);
   const [isLocating, setIsLocating] = useState(true);
   const [isWebViewLoading, setIsWebViewLoading] = useState(true);
   const [hasLoadedWebView, setHasLoadedWebView] = useState(false);
@@ -149,10 +189,40 @@ const MapScreen = () => {
   const [isTimelinePlaying, setIsTimelinePlaying] = useState(false);
 
   const forecastDays = useMemo(() => buildForecastDays(), []);
-  const windyUrl = useMemo(() => (
-    coordinate ? buildWindyUrl(coordinate) : null
-  ), [coordinate]);
   const isLoading = isLocating || (!hasLoadedWebView && isWebViewLoading) || !windyUrl;
+
+  const selectOverlay = useCallback((overlay) => {
+    Haptics.selectionAsync();
+    setSelectedOverlay(overlay);
+    setIsTimelinePlaying(false);
+
+    const viewport = viewportRef.current ?? coordinate;
+    if (!viewport) return;
+
+    setHasLoadedWebView(false);
+    setIsWebViewLoading(true);
+    setWindyUrl(buildWindyUrl(viewport, overlay));
+  }, [coordinate]);
+
+  const handleWebViewMessage = useCallback((event) => {
+    try {
+      const message = JSON.parse(event.nativeEvent.data);
+      if (
+        message.type === 'viewport' &&
+        Number.isFinite(message.latitude) &&
+        Number.isFinite(message.longitude) &&
+        Number.isFinite(message.zoom)
+      ) {
+        viewportRef.current = {
+          latitude: message.latitude,
+          longitude: message.longitude,
+          zoom: message.zoom,
+        };
+      }
+    } catch {
+      // Ignore messages not emitted by the KALASAG bridge.
+    }
+  }, []);
 
   const applyWindyState = useCallback(() => {
     if (!hasLoadedWebView || !webViewRef.current) return;
@@ -191,14 +261,19 @@ const MapScreen = () => {
         });
 
         if (isMounted) {
-          setCoordinate({
+          const currentCoordinate = {
             latitude: position.coords.latitude,
             longitude: position.coords.longitude,
-          });
+          };
+          setCoordinate(currentCoordinate);
+          viewportRef.current = { ...currentCoordinate, zoom: 10 };
+          setWindyUrl(buildWindyUrl(currentCoordinate, 'wind'));
         }
       } catch (locationError) {
         if (isMounted) {
           setCoordinate(MANILA_COORDINATE);
+          viewportRef.current = { ...MANILA_COORDINATE, zoom: 10 };
+          setWindyUrl(buildWindyUrl(MANILA_COORDINATE, 'wind'));
           setError(locationError instanceof Error ? locationError.message : 'Unable to read device location. Showing Manila by default.');
         }
       } finally {
@@ -265,6 +340,7 @@ const MapScreen = () => {
             setHasLoadedWebView(true);
             setIsWebViewLoading(false);
           }}
+          onMessage={handleWebViewMessage}
           onError={() => {
             setIsWebViewLoading(false);
             setError('Windy map is temporarily unavailable.');
@@ -282,10 +358,7 @@ const MapScreen = () => {
           layers={WINDY_LAYERS}
           selectedOverlay={selectedOverlay}
           setIsOpen={setIsSidebarOpen}
-          setSelectedOverlay={(overlay) => {
-            Haptics.selectionAsync();
-            setSelectedOverlay(overlay);
-          }}
+          setSelectedOverlay={selectOverlay}
         />
       ) : null}
 
