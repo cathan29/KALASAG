@@ -179,7 +179,16 @@ const AlertsScreen = () => {
         showsVerticalScrollIndicator={false}
         refreshControl={<RefreshControl refreshing={isLoading} onRefresh={refreshAlerts} tintColor={theme.colors.primary} colors={[theme.colors.primary]} />}
         ListHeaderComponent={header}
-        ListEmptyComponent={<EmptyState title={activeFilter === 'all' ? 'Walang naitalang sakuna ngayon. Ligtas ang araw!' : 'No advisories in this category.'} />}
+        ListEmptyComponent={(
+          <EmptyState
+            animationSource={activeFilter !== 'all'
+              ? require('../../assets/animations/no-advisories.json')
+              : undefined}
+            title={activeFilter === 'all'
+              ? 'Walang naitalang sakuna ngayon. Ligtas ang araw!'
+              : 'No advisories in this category.'}
+          />
+        )}
       />
     </View>
   );

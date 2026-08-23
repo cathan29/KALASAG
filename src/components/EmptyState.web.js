@@ -14,6 +14,7 @@ const EmptyState = ({
   title = 'Walang naitalang sakuna ngayon. Ligtas ang araw!',
   message,
   variant = 'safe',
+  animationSource,
 }) => {
   const theme = useTheme();
   const styles = useMemo(() => createStyles(theme), [theme]);
@@ -22,7 +23,7 @@ const EmptyState = ({
     <View style={styles.container}>
       {variant === 'safe' ? (
         <LottieView
-          source={require('@meteocons/lottie/fill/clear-day.json')}
+          source={animationSource ?? require('@meteocons/lottie/fill/clear-day.json')}
           autoPlay
           loop
           speed={0.7}
