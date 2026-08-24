@@ -10,6 +10,14 @@ const formatPublishedAt = (value) => {
   return date.toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' });
 };
 
+const cleanAndFormatText = (text) => {
+  if (typeof text !== 'string') return '';
+  return text
+    .replace(/&#xD;|&#xA;/g, '\n')
+    .replace(/&#x201C;|&#x201D;/g, '"')
+    .replace(/\n{3,}/g, '\n\n');
+};
+
 const AlertDetailScreen = ({ navigation, route }) => {
   const theme = useTheme();
   const styles = useMemo(() => createStyles(theme), [theme]);
@@ -106,7 +114,25 @@ const AlertDetailScreen = ({ navigation, route }) => {
         )}
         <Chip compact style={styles.severityChip} textStyle={[styles.severityText, isUrgent && { color: theme.colors.error }]}>{alert.severity}</Chip>
         <Text style={styles.title}>{alert.title}</Text>
-        <Text style={styles.description}>{alert.description}</Text>
+        {cleanAndFormatText(alert.description)
+          .split('\n')
+          .filter((p) => p.trim() !== '')
+          .map((paragraph, index) => {
+            const letters = paragraph.replace(/[^a-zA-Z]/g, '');
+            const isUppercase = letters.length > 0 && letters === letters.toUpperCase();
+            return (
+              <Text
+                key={index}
+                style={[
+                  styles.descriptionParagraph,
+                  index === 0 && { marginTop: 10 },
+                  isUppercase && { fontWeight: '700' },
+                ]}
+              >
+                {paragraph}
+              </Text>
+            );
+          })}
       </Surface>
 
       <Surface elevation={1} style={styles.infoCard}>
@@ -164,7 +190,7 @@ const createStyles = (theme) => StyleSheet.create({
   lpaBadge: { alignSelf: 'flex-start', marginTop: 14, backgroundColor: theme.colors.secondaryContainer, marginRight: 8 },
   lpaText: { color: theme.colors.secondary, fontSize: 11, fontWeight: '800' },
   title: { color: theme.colors.text.primary, fontSize: 26, lineHeight: 33, fontWeight: '800', marginTop: 12 },
-  description: { color: theme.colors.text.secondary, fontSize: 15, lineHeight: 23, marginTop: 10 },
+  descriptionParagraph: { color: theme.colors.text.secondary, fontSize: 15, lineHeight: 24, marginBottom: 12 },
   infoCard: { marginTop: 14, borderRadius: theme.borderRadius.lg, backgroundColor: theme.colors.surface, borderWidth: StyleSheet.hairlineWidth, borderColor: theme.colors.border, overflow: 'hidden' },
   detailRow: { minHeight: 74, flexDirection: 'row', alignItems: 'flex-start', gap: 12, padding: theme.spacing.md },
   detailCopy: { flex: 1 },

@@ -44,7 +44,13 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#08111F"
-      }
+      },
+      "permissions": [
+        "android.permission.ACCESS_COARSE_LOCATION",
+        "android.permission.ACCESS_FINE_LOCATION",
+        "android.permission.ACCESS_COARSE_LOCATION",
+        "android.permission.ACCESS_FINE_LOCATION"
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -53,7 +59,16 @@
       "react-native-google-mobile-ads": {
         "android_app_id": "ca-app-pub-3940256099942544~3347511713",
         "ios_app_id": "ca-app-pub-3940256099942544~1458002511"
+      },
+      "eas": {
+        "projectId": "b052fa86-2961-46b0-8d50-826159f0de38"
       }
+    },
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/b052fa86-2961-46b0-8d50-826159f0de38"
     }
   }
 }

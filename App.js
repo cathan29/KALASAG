@@ -1,11 +1,12 @@
 import 'react-native-gesture-handler';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { AppState, StatusBar, StyleSheet, useColorScheme, View } from 'react-native';
+import { AppState, StatusBar, StyleSheet, useColorScheme, View, Platform } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { DarkTheme, DefaultTheme, NavigationContainer } from '@react-navigation/native';
 import { PaperProvider } from 'react-native-paper';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import * as Location from 'expo-location';
+import * as Notifications from 'expo-notifications';
 import AppNavigator from './src/navigation/AppNavigator';
 import SplashScreen from './src/screens/SplashScreen';
 import OfflineBanner from './src/components/OfflineBanner';
@@ -19,6 +20,15 @@ import {
   subscribeToNotificationResponses,
 } from './src/services/notificationService';
 // import mobileAds, { MaxAdContentRating } from 'react-native-google-mobile-ads';
+
+// Configure how notifications are handled when the app is in the foreground
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: true,
+    shouldSetBadge: true,
+  }),
+});
 
 const ALERT_REFRESH_INTERVAL_MS = 5 * 60 * 1000;
 
@@ -90,6 +100,31 @@ export default function App() {
     getLastNotificationAlertId().then(openAlert).catch(() => {});
     return () => subscription.remove();
   }, [openAlert]);
+
+  useEffect(() => {
+    const setupNotifications = async () => {
+      try {
+        const { status } = await Notifications.requestPermissionsAsync();
+        if (status !== 'granted') {
+          console.log('Notification permissions not granted');
+          return;
+        }
+
+        if (Platform.OS === 'android') {
+          await Notifications.setNotificationChannelAsync('default', {
+            name: 'Default Alerts',
+            importance: Notifications.AndroidImportance.MAX,
+            vibrationPattern: [0, 250, 250, 250],
+            lightColor: '#FF231F7C',
+          });
+        }
+      } catch (error) {
+        console.error('Error setting up notifications:', error);
+      }
+    };
+
+    setupNotifications();
+  }, []);
 
   useEffect(() => {
     const initializeLocation = async () => {

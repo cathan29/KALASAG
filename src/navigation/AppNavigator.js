@@ -1,5 +1,6 @@
 import React, { useMemo } from 'react';
 import { Platform, StyleSheet } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
@@ -25,6 +26,8 @@ const TAB_LABELS = {
   Emergency: 'SOS',
 };
 
+const BASE_HEIGHT = 60;
+
 const renderTabIcon = (routeName, focused, color, size) => {
   if (routeName === 'Weather') {
     return <Ionicons name={focused ? 'partly-sunny' : 'partly-sunny-outline'} size={size} color={color} />;
@@ -43,6 +46,7 @@ const renderTabIcon = (routeName, focused, color, size) => {
 
 const MainTabs = () => {
   const theme = useTheme();
+  const insets = useSafeAreaInsets();
   const styles = useMemo(() => createStyles(theme), [theme]);
 
   return (
@@ -54,7 +58,13 @@ const MainTabs = () => {
         tabBarInactiveTintColor: theme.colors.text.muted,
         tabBarHideOnKeyboard: true,
         tabBarLabelStyle: styles.label,
-        tabBarStyle: styles.bar,
+        tabBarStyle: [
+          styles.bar,
+          {
+            height: Platform.OS === 'ios' ? 78 : BASE_HEIGHT + Math.max(insets.bottom, 8),
+            paddingBottom: Platform.OS === 'ios' ? 18 : Math.max(insets.bottom, 8)
+          }
+        ],
         tabBarItemStyle: styles.item,
         headerShown: false,
       })}
@@ -89,9 +99,7 @@ const AppNavigator = () => {
 
 const createStyles = (theme) => StyleSheet.create({
   bar: {
-    height: Platform.OS === 'ios' ? 78 : 66,
     paddingTop: 7,
-    paddingBottom: Platform.OS === 'ios' ? 18 : 8,
     backgroundColor: theme.colors.surface,
     borderTopWidth: StyleSheet.hairlineWidth,
     borderTopColor: theme.colors.border,

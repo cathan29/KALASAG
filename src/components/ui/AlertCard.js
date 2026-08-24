@@ -3,6 +3,7 @@ import { StyleSheet, Text, View, Pressable } from 'react-native';
 import { Surface, useTheme } from 'react-native-paper';
 import { Ionicons } from '@expo/vector-icons';
 import { Swipeable } from 'react-native-gesture-handler';
+import { sanitizePreviewText } from '../../services/textUtils';
 
 const CATEGORY_ICONS = {
   weather: 'rainy-outline',
@@ -68,9 +69,9 @@ const AlertCard = ({ item, navigation, onShare, onMarkAsRead, formattedTime }) =
             </View>
             <View style={styles.titleRow}>
               <Ionicons name={tone.icon} size={21} color={tone.color} />
-              <Text style={styles.alertTitle}>{item.title || 'Untitled advisory'}</Text>
+              <Text style={styles.alertTitle}>{sanitizePreviewText(item.title || 'Untitled advisory')}</Text>
             </View>
-            {item.description ? <Text style={styles.description} numberOfLines={4}>{item.description}</Text> : null}
+            {item.description ? <Text style={styles.description} numberOfLines={3} ellipsizeMode="tail">{sanitizePreviewText(item.description)}</Text> : null}
             <View style={styles.footer}>
               <Text style={[styles.severity, { color: tone.color }]}>{item.severity || 'Advisory'}</Text>
               <View style={styles.detailLink}>

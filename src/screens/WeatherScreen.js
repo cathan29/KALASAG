@@ -299,15 +299,6 @@ const WeatherScreen = () => {
             <Text style={styles.updated}>{updatedAt ? `Checked ${updatedAt}` : 'Updating'}</Text>
           </View>
         </LinearGradient>
-        <View style={styles.sourceRow}>
-          <Ionicons name="git-compare-outline" size={16} color={theme.colors.secondary} />
-          <Text style={styles.sourceText} numberOfLines={1}>
-            {weatherMeta.modelCount
-              ? `Open-Meteo · ${weatherMeta.modelCount} models · ${weatherMeta.rainVotes}/${weatherMeta.modelCount} detect rain`
-              : 'Open-Meteo live forecast'}
-          </Text>
-          <Text style={styles.confidence}>{weatherMeta.confidence ?? 'Live'}</Text>
-        </View>
         <Surface elevation={1} style={styles.metrics}>
           <Metric icon="water-outline" label="Humidity" value={formatValue(current.relative_humidity_2m, '%')} theme={theme} styles={styles} />
           <View style={styles.dividerVertical} />
@@ -395,9 +386,6 @@ const createStyles = (theme) => StyleSheet.create({
   riskRow: { flexDirection: 'row', alignItems: 'center', gap: 5, backgroundColor: 'rgba(0,0,0,0.18)', paddingHorizontal: 10, paddingVertical: 7, borderRadius: theme.borderRadius.full },
   risk: { fontSize: 12, fontWeight: '700' },
   updated: { flex: 1, color: 'rgba(255,255,255,0.72)', fontSize: 12, textAlign: 'right' },
-  sourceRow: { minHeight: 28, flexDirection: 'row', alignItems: 'center', gap: 7, paddingHorizontal: 3 },
-  sourceText: { flex: 1, color: theme.colors.text.secondary, fontSize: 12 },
-  confidence: { color: theme.colors.secondary, fontSize: 11, fontWeight: '700' },
   metrics: { flexDirection: 'row', minHeight: 104, paddingVertical: theme.spacing.md, backgroundColor: theme.colors.surface, borderRadius: theme.borderRadius.md, borderWidth: StyleSheet.hairlineWidth, borderColor: theme.colors.border },
   metric: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 4, paddingHorizontal: 5 },
   metricValue: { color: theme.colors.text.primary, fontSize: 16, fontWeight: '700', maxWidth: '100%' },
