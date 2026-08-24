@@ -10,6 +10,7 @@ import { useAlertsStore } from '../store/useAlertsStore';
 import { useNetworkStatus } from '../hooks/useNetworkStatus';
 import SkeletonLoader from '../components/SkeletonLoader';
 import EmptyState from '../components/EmptyState';
+// import AdBanner from '../components/ui/AdBanner';
 
 const WEATHER_MASCOTS = {
   happy: require('../../assets/mascot/kalasag-weather-happy.png'),
@@ -348,6 +349,7 @@ const WeatherScreen = () => {
           dropSize={{ min: 1, max: 2 }}
         />
       )}
+      {/* <AdBanner /> */}
     </View>
   );
 }
@@ -370,7 +372,7 @@ const SectionTitle = ({ icon, title, theme, styles }) => (
 const createStyles = (theme) => StyleSheet.create({
   screenContainer: { flex: 1, backgroundColor: theme.colors.background },
   screen: { flex: 1, backgroundColor: 'transparent' },
-  content: { paddingHorizontal: theme.spacing.md, paddingTop: 18, paddingBottom: theme.spacing.lg, gap: theme.spacing.md },
+  content: { paddingHorizontal: theme.spacing.md, paddingTop: 18, paddingBottom: 20, gap: theme.spacing.md },
   center: { flex: 1, justifyContent: 'center', backgroundColor: theme.colors.background },
   header: { gap: 5 },
   screenTitle: { color: theme.colors.text.primary, fontSize: 30, lineHeight: 36, fontWeight: '700', letterSpacing: 0 },

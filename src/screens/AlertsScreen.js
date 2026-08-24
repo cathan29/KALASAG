@@ -2,11 +2,14 @@ import React, { useCallback, useMemo, useState } from 'react';
 import { FlatList, Image, Pressable, RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
+import Animated, { FadeInDown } from 'react-native-reanimated';
 import { Chip, IconButton, Surface, useTheme } from 'react-native-paper';
 import { useAlertsStore } from '../store/useAlertsStore';
 import { useNetworkStatus } from '../hooks/useNetworkStatus';
 import EmptyState from '../components/EmptyState';
 import SkeletonLoader from '../components/SkeletonLoader';
+import AlertCard from '../components/ui/AlertCard';
+import LiveIndicator from '../components/ui/LiveIndicator';
 
 const FILTERS = [
   { id: 'all', label: 'All', icon: 'apps-outline' },
@@ -16,7 +19,6 @@ const FILTERS = [
   { id: 'volcano', label: 'Volcano', icon: 'triangle-outline' },
   { id: 'wildfire', label: 'Fire', icon: 'flame-outline' },
 ];
-const CATEGORY_ICONS = { weather: 'rainy-outline', earthquake: 'pulse-outline', tsunami: 'water-outline', volcano: 'triangle-outline', wildfire: 'flame-outline' };
 
 const validDate = (value) => {
   const date = new Date(value);
@@ -63,42 +65,6 @@ const AlertsScreen = ({ navigation }) => {
     return { color: theme.colors.secondary, icon: 'information-circle' };
   };
 
-  const renderAlert = ({ item }) => {
-    const tone = severityTone(item.severity);
-    return (
-      <Pressable
-        onPress={() => navigation.navigate('AlertDetails', { alertId: String(item.id), alert: item })}
-        accessibilityRole="button"
-        accessibilityLabel={`Open advisory: ${item.title}`}
-      >
-        <Surface elevation={1} style={styles.alertCard}>
-          <View style={[styles.severityBar, { backgroundColor: tone.color }]} />
-          <View style={styles.alertBody}>
-            <View style={styles.metaRow}>
-              <View style={styles.sourceRow}>
-                <Ionicons name={CATEGORY_ICONS[item.category] ?? 'notifications-outline'} size={15} color={theme.colors.secondary} />
-                <Text style={styles.source} numberOfLines={1}>{item.source || 'Advisory'}</Text>
-              </View>
-              <Text style={styles.time}>{relativeTime(item.publishedAt ?? item.timestamp)}</Text>
-            </View>
-            <View style={styles.titleRow}>
-              <Ionicons name={tone.icon} size={21} color={tone.color} />
-              <Text style={styles.alertTitle}>{item.title || 'Untitled advisory'}</Text>
-            </View>
-            {item.description ? <Text style={styles.description} numberOfLines={4}>{item.description}</Text> : null}
-            <View style={styles.footer}>
-              <Text style={[styles.severity, { color: tone.color }]}>{item.severity || 'Advisory'}</Text>
-              <View style={styles.detailLink}>
-                <Text style={styles.detailLinkText}>View details</Text>
-                <Ionicons name="chevron-forward" size={16} color={theme.colors.primary} />
-              </View>
-            </View>
-          </View>
-        </Surface>
-      </Pressable>
-    );
-  };
-
   if (isLoading && alertsData === null) return <SkeletonLoader variant="list" />;
   if (alertsData === null && !isLoading && isOffline) {
     return <View style={styles.center}><EmptyState variant="offline" title="Alerts unavailable offline" message="Connect once to save the latest advisories." /></View>;
@@ -113,7 +79,7 @@ const AlertsScreen = ({ navigation }) => {
         <View style={styles.headerCopy}>
           <Text style={styles.screenTitle}>Alerts</Text>
           <View style={styles.statusRow}>
-            <View style={[styles.statusDot, isOffline && styles.offlineDot]} />
+            {!isOffline ? <LiveIndicator /> : <View style={[styles.statusDot, styles.offlineDot]} />}
             <Text style={styles.subtitle}>{isOffline ? 'Saved alerts' : `Live · Updated ${relativeTime(lastUpdated)}`}</Text>
           </View>
         </View>
@@ -167,8 +133,19 @@ const AlertsScreen = ({ navigation }) => {
     <View style={styles.screen}>
       <FlatList
         data={filteredAlerts}
-        keyExtractor={(item, index) => String(item.id || item.title || index)}
-        renderItem={renderAlert}
+        extraData={activeFilter}
+        keyExtractor={(item, index) => `${activeFilter}-${item.id || item.title || index}`}
+        renderItem={({ item, index }) => (
+          <Animated.View entering={FadeInDown.delay(index * 50)}>
+            <AlertCard
+              item={item}
+              navigation={navigation}
+              formattedTime={relativeTime(item.publishedAt ?? item.timestamp)}
+              onShare={(alert) => console.log('Share alert:', alert.id)}
+              onMarkAsRead={(alert) => console.log('Mark as read:', alert.id)}
+            />
+          </Animated.View>
+        )}
         contentContainerStyle={styles.list}
         ItemSeparatorComponent={() => <View style={styles.itemGap} />}
         showsVerticalScrollIndicator={false}
@@ -220,20 +197,6 @@ const createStyles = (theme) => StyleSheet.create({
   sectionTitle: { color: theme.colors.text.primary, fontSize: 19, fontWeight: '700' },
   count: { color: theme.colors.text.muted, fontSize: 13, fontVariant: ['tabular-nums'] },
   itemGap: { height: 10 },
-  alertCard: { flexDirection: 'row', backgroundColor: theme.colors.surface, borderRadius: theme.borderRadius.md, borderWidth: StyleSheet.hairlineWidth, borderColor: theme.colors.border, overflow: 'hidden' },
-  severityBar: { width: 4 },
-  alertBody: { flex: 1, padding: 15 },
-  metaRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 10 },
-  sourceRow: { flex: 1, flexDirection: 'row', alignItems: 'center', gap: 6 },
-  source: { flex: 1, color: theme.colors.secondary, fontSize: 11, fontWeight: '700', textTransform: 'uppercase' },
-  time: { color: theme.colors.text.muted, fontSize: 11 },
-  titleRow: { flexDirection: 'row', alignItems: 'flex-start', gap: 9, marginTop: 12 },
-  alertTitle: { flex: 1, color: theme.colors.text.primary, fontSize: 17, lineHeight: 23, fontWeight: '700' },
-  description: { color: theme.colors.text.secondary, fontSize: 13, lineHeight: 20, marginTop: 10 },
-  footer: { minHeight: 34, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 10 },
-  severity: { fontSize: 11, fontWeight: '700', textTransform: 'uppercase' },
-  detailLink: { flexDirection: 'row', alignItems: 'center', gap: 2 },
-  detailLinkText: { color: theme.colors.primary, fontSize: 12, fontWeight: '700' },
 });
 
 export default AlertsScreen;
