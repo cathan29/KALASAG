@@ -4,14 +4,6 @@ import { Ionicons } from '@expo/vector-icons';
 import { Button, Chip, IconButton, Surface, useTheme } from 'react-native-paper';
 import { useAlertsStore } from '../store/useAlertsStore';
 
-const ACTIONS = {
-  earthquake: ['Move away from glass and unstable objects.', 'Drop, cover, and hold during shaking.', 'Expect aftershocks and follow local authorities.'],
-  tsunami: ['Move inland and to higher ground immediately.', 'Stay away from beaches and waterways.', 'Wait for the official all-clear before returning.'],
-  volcano: ['Follow the declared danger-zone restrictions.', 'Protect your eyes and lungs from ash.', 'Prepare to evacuate when instructed by local authorities.'],
-  wildfire: ['Leave early when evacuation is advised.', 'Close windows and limit smoke exposure.', 'Keep roads clear for emergency responders.'],
-  weather: ['Monitor PAGASA and local government updates.', 'Avoid flooded roads and fast-moving water.', 'Charge devices and prepare essential supplies.'],
-};
-
 const formatPublishedAt = (value) => {
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return 'Time unavailable';
@@ -39,10 +31,49 @@ const AlertDetailScreen = ({ navigation, route }) => {
   const affectedAreas = Array.isArray(alert.affectedAreas) && alert.affectedAreas.length
     ? alert.affectedAreas
     : ['Location shown in the official advisory'];
-  const genericActions = ACTIONS[alert.category] ?? ACTIONS.weather;
+
   const actions = alert.instructions
-    ? [alert.instructions, ...genericActions].slice(0, 3)
-    : genericActions;
+    ? (Array.isArray(alert.instructions) ? alert.instructions : [alert.instructions])
+    : ['Follow official guidance from local authorities.'];
+
+  const renderDynamicDetails = () => {
+    const props = alert.properties || {};
+    const details = [];
+
+    if (alert.category === 'weather') {
+      if (props.windSpeed) details.push({ label: 'Wind Speed', value: props.windSpeed, icon: 'wind-outline' });
+      if (props.direction) details.push({ label: 'Direction', value: props.direction, icon: 'compass-outline' });
+      if (props.forecastTrack) details.push({ label: 'Forecast Track', value: props.forecastTrack, icon: 'map-outline' });
+    } else if (alert.category === 'earthquake') {
+      if (props.magnitude) details.push({ label: 'Magnitude', value: `M ${props.magnitude}`, icon: 'pulse-outline' });
+      if (props.depth) details.push({ label: 'Depth', value: `${props.depth} km`, icon: 'arrow-down-outline' });
+      if (props.epicenter) details.push({ label: 'Epicenter', value: props.epicenter, icon: 'map-marker-outline' });
+    } else if (alert.category === 'tsunami') {
+      if (props.waveHeight) details.push({ label: 'Wave Height', value: props.waveHeight, icon: 'water-outline' });
+      if (props.estimatedArrival) details.push({ label: 'Est. Arrival', value: props.estimatedArrival, icon: 'clock-outline' });
+    }
+
+    // Fallback: Add any properties that weren't explicitly mapped
+    const mappedKeys = ['windSpeed', 'direction', 'forecastTrack', 'magnitude', 'depth', 'epicenter', 'waveHeight', 'estimatedArrival'];
+    Object.entries(props).forEach(([key, value]) => {
+      if (!mappedKeys.includes(key) && typeof value === 'string' && value.trim()) {
+        const label = key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase());
+        details.push({ label, value, icon: 'information-outline' });
+      }
+    });
+
+    return details.map((detail, index) => (
+      <DetailRow
+        key={index}
+        icon={detail.icon}
+        label={detail.label}
+        value={detail.value}
+        theme={theme}
+        styles={styles}
+        last={index === details.length - 1}
+      />
+    ));
+  };
 
   const openSource = async () => {
     if (alert.sourceUrl && await Linking.canOpenURL(alert.sourceUrl)) Linking.openURL(alert.sourceUrl);
@@ -70,15 +101,24 @@ const AlertDetailScreen = ({ navigation, route }) => {
         <View style={[styles.alertIcon, isUrgent && styles.urgentIcon]}>
           <Ionicons name={isUrgent ? 'warning' : 'information-circle'} size={28} color={isUrgent ? theme.colors.error : theme.colors.primary} />
         </View>
+        {((alert.title || '').toLowerCase().includes('lpa') || (alert.description || '').toLowerCase().includes('low pressure area')) && (
+          <Chip compact style={styles.lpaBadge} textStyle={styles.lpaText}>Low Pressure Area</Chip>
+        )}
         <Chip compact style={styles.severityChip} textStyle={[styles.severityText, isUrgent && { color: theme.colors.error }]}>{alert.severity}</Chip>
         <Text style={styles.title}>{alert.title}</Text>
         <Text style={styles.description}>{alert.description}</Text>
       </Surface>
 
       <Surface elevation={1} style={styles.infoCard}>
-        <DetailRow icon="location-outline" label="Affected locations" value={affectedAreas.join(', ')} theme={theme} styles={styles} />
-        <DetailRow icon="time-outline" label="Published" value={formatPublishedAt(alert.publishedAt)} theme={theme} styles={styles} />
-        <DetailRow icon="shield-checkmark-outline" label="Official source" value={alert.source || 'Official advisory'} theme={theme} styles={styles} last />
+        {renderDynamicDetails()}
+        {/* If no dynamic details, show basic info */}
+        {Object.keys(alert.properties || {}).length === 0 && (
+          <>
+            <DetailRow icon="location-outline" label="Affected locations" value={affectedAreas.join(', ')} theme={theme} styles={styles} />
+            <DetailRow icon="time-outline" label="Published" value={formatPublishedAt(alert.publishedAt)} theme={theme} styles={styles} />
+            <DetailRow icon="shield-checkmark-outline" label="Official source" value={alert.source || 'Official advisory'} theme={theme} styles={styles} last />
+          </>
+        )}
       </Surface>
 
       <Text style={styles.sectionTitle}>Recommended actions</Text>
@@ -121,6 +161,8 @@ const createStyles = (theme) => StyleSheet.create({
   urgentIcon: { backgroundColor: `${theme.colors.error}18` },
   severityChip: { alignSelf: 'flex-start', marginTop: 14, backgroundColor: theme.colors.surfaceSoft },
   severityText: { color: theme.colors.primary, fontSize: 11, fontWeight: '800' },
+  lpaBadge: { alignSelf: 'flex-start', marginTop: 14, backgroundColor: theme.colors.secondaryContainer, marginRight: 8 },
+  lpaText: { color: theme.colors.secondary, fontSize: 11, fontWeight: '800' },
   title: { color: theme.colors.text.primary, fontSize: 26, lineHeight: 33, fontWeight: '800', marginTop: 12 },
   description: { color: theme.colors.text.secondary, fontSize: 15, lineHeight: 23, marginTop: 10 },
   infoCard: { marginTop: 14, borderRadius: theme.borderRadius.lg, backgroundColor: theme.colors.surface, borderWidth: StyleSheet.hairlineWidth, borderColor: theme.colors.border, overflow: 'hidden' },

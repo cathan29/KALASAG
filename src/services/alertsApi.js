@@ -263,6 +263,7 @@ const normalizeGdacsFeature = (feature) => {
     category: eventCategory(eventType),
     coordinates: isInsidePhilippines(coordinates) ? coordinates : null,
     affectedAreas: cleanAreaList(firstText(properties.country, properties.countryname, properties.affectedcountries)),
+    properties: properties,
   };
 };
 
@@ -290,6 +291,7 @@ const normalizeUsgsFeature = (feature) => {
     category: 'earthquake',
     coordinates,
     affectedAreas: [place],
+    properties: properties,
   };
 };
 
@@ -320,6 +322,7 @@ const normalizeOfficialAlert = (alert, index) => {
     coordinates,
     affectedAreas: cleanAreaList(alert?.affectedAreas ?? alert?.areas ?? alert?.location),
     instructions: asPlainText(firstText(alert?.instructions, alert?.instruction)),
+    properties: alert,
   };
 };
 
@@ -351,6 +354,7 @@ const normalizePagasaCap = (entry, capDocument) => {
     coordinates: getCapCoordinates(info.area),
     affectedAreas: getCapAffectedAreas(info.area),
     instructions: instruction,
+    properties: info,
   };
 };
 
@@ -391,6 +395,7 @@ const normalizeEonetEvent = (event) => {
     category,
     coordinates,
     affectedAreas: cleanAreaList(firstText(event?.title, event?.categories?.[0]?.title)),
+    properties: event,
   };
 };
 
@@ -423,6 +428,7 @@ const normalizePtwcCap = (capDocument) => {
     coordinates: getCapCoordinates(info.area),
     affectedAreas: getCapAffectedAreas(info.area),
     instructions: asPlainText(firstText(info.instruction)),
+    properties: info,
   };
 };
 
