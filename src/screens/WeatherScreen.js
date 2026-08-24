@@ -4,6 +4,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import LottieView from 'lottie-react-native';
 import { Surface, useTheme } from 'react-native-paper';
+import { RainBackground } from '../components/ui/RainBackground';
 import useWeatherStore from '../store/useWeatherStore';
 import { useAlertsStore } from '../store/useAlertsStore';
 import { useNetworkStatus } from '../hooks/useNetworkStatus';
@@ -183,6 +184,11 @@ const WeatherScreen = () => {
   const cycloneContext = useMemo(() => (
     findRelevantCycloneAlert(Array.isArray(alertsData) ? alertsData : [], userLocation)
   ), [alertsData, userLocation]);
+  const shouldShowRain = useMemo(() => {
+    const code = current.weather_code;
+    const precipitation = Number(current.precipitation);
+    return RAIN_CODES.includes(code) || STORM_CODES.includes(code) || precipitation >= 0.1;
+  }, [current.weather_code, current.precipitation]);
   const nextHours = useMemo(() => (
     (() => {
       const times = hourly.time ?? [];
@@ -233,112 +239,118 @@ const WeatherScreen = () => {
   };
 
   return (
-    <ScrollView
-      style={styles.screen}
-      contentContainerStyle={styles.content}
-      refreshControl={<RefreshControl refreshing={isLoading} onRefresh={refreshAll} colors={[theme.colors.primary]} tintColor={theme.colors.primary} />}
-    >
-      <View style={styles.header}>
-        <Text style={styles.screenTitle}>Weather</Text>
-        <View style={styles.locationRow}>
-          <Ionicons name="location-outline" size={16} color={theme.colors.primary} />
-          <Text style={styles.location} numberOfLines={1}>{locationLabel || 'Current location'}</Text>
+    <View style={styles.screenContainer}>
+      <ScrollView
+        style={styles.screen}
+        contentContainerStyle={styles.content}
+        refreshControl={<RefreshControl refreshing={isLoading} onRefresh={refreshAll} colors={[theme.colors.primary]} tintColor={theme.colors.primary} />}
+      >
+        <View style={styles.header}>
+          <Text style={styles.screenTitle}>Weather</Text>
+          <View style={styles.locationRow}>
+            <Ionicons name="location-outline" size={16} color={theme.colors.primary} />
+            <Text style={styles.location} numberOfLines={1}>{locationLabel || 'Current location'}</Text>
+          </View>
         </View>
-      </View>
-
-      <LinearGradient colors={theme.gradients.weather} style={styles.hero}>
-        <View style={styles.heroMedia} pointerEvents="none">
-          <Image
-            source={WEATHER_MASCOTS[mascotMood]}
-            resizeMode="cover"
-            style={styles.heroMascot}
-            fadeDuration={180}
-            accessibilityIgnoresInvertColors
+        <LinearGradient colors={theme.gradients.weather} style={styles.hero}>
+          <View style={styles.heroMedia} pointerEvents="none">
+            <Image
+              source={WEATHER_MASCOTS[mascotMood]}
+              resizeMode="cover"
+              style={styles.heroMascot}
+              fadeDuration={180}
+              accessibilityIgnoresInvertColors
+            />
+          </View>
+          <LinearGradient
+            colors={['rgba(7,18,35,0.92)', 'rgba(7,18,35,0.58)', 'rgba(7,18,35,0.06)']}
+            start={{ x: 0, y: 0.5 }}
+            end={{ x: 1, y: 0.5 }}
+            style={styles.heroShade}
           />
-        </View>
-        <LinearGradient
-          colors={['rgba(7,18,35,0.92)', 'rgba(7,18,35,0.58)', 'rgba(7,18,35,0.06)']}
-          start={{ x: 0, y: 0.5 }}
-          end={{ x: 1, y: 0.5 }}
-          style={styles.heroShade}
-        />
-        <View style={styles.heroTop}>
-          <View style={styles.heroCopy}>
-            <View style={styles.nowRow}>
-              <Text style={styles.now}>NOW</Text>
-              <LottieView
-                source={weatherAnimationForCode(current.weather_code, current.time)}
-                autoPlay
-                loop
-                speed={0.75}
-                resizeMode="contain"
-                style={styles.weatherAnimation}
-              />
+          <View style={styles.heroTop}>
+            <View style={styles.heroCopy}>
+              <View style={styles.nowRow}>
+                <Text style={styles.now}>NOW</Text>
+                <LottieView
+                  source={weatherAnimationForCode(current.weather_code, current.time)}
+                  autoPlay
+                  loop
+                  speed={0.75}
+                  resizeMode="contain"
+                  style={styles.weatherAnimation}
+                />
+              </View>
+              <Text style={styles.condition} numberOfLines={2} adjustsFontSizeToFit minimumFontScale={0.78}>
+                {weatherData?.condition ?? 'Local weather'}
+              </Text>
             </View>
-            <Text style={styles.condition} numberOfLines={2} adjustsFontSizeToFit minimumFontScale={0.78}>
-              {weatherData?.condition ?? 'Local weather'}
-            </Text>
           </View>
-        </View>
-        <View style={styles.temperatureRow}>
-          <Text style={styles.temperature} numberOfLines={1} adjustsFontSizeToFit>{formatValue(current.temperature_2m, '°')}</Text>
-          <Text style={styles.feelsLike} numberOfLines={1}>Feels like {formatValue(current.apparent_temperature, '°')}</Text>
-        </View>
-        <View style={styles.heroBottom}>
-          <View style={styles.riskRow}>
-            <Ionicons name={risk.icon} size={16} color={riskColor} />
-            <Text style={[styles.risk, { color: riskColor }]}>{risk.label}</Text>
+          <View style={styles.temperatureRow}>
+            <Text style={styles.temperature} numberOfLines={1} adjustsFontSizeToFit>{formatValue(current.temperature_2m, '°')}</Text>
+            <Text style={styles.feelsLike} numberOfLines={1}>Feels like {formatValue(current.apparent_temperature, '°')}</Text>
           </View>
-          <Text style={styles.updated}>{updatedAt ? `Checked ${updatedAt}` : 'Updating'}</Text>
-        </View>
-      </LinearGradient>
-
-      <View style={styles.sourceRow}>
-        <Ionicons name="git-compare-outline" size={16} color={theme.colors.secondary} />
-        <Text style={styles.sourceText} numberOfLines={1}>
-          {weatherMeta.modelCount
-            ? `Open-Meteo · ${weatherMeta.modelCount} models · ${weatherMeta.rainVotes}/${weatherMeta.modelCount} detect rain`
-            : 'Open-Meteo live forecast'}
-        </Text>
-        <Text style={styles.confidence}>{weatherMeta.confidence ?? 'Live'}</Text>
-      </View>
-
-      <Surface elevation={1} style={styles.metrics}>
-        <Metric icon="water-outline" label="Humidity" value={formatValue(current.relative_humidity_2m, '%')} theme={theme} styles={styles} />
-        <View style={styles.dividerVertical} />
-        <Metric icon="navigate-outline" label="Wind" value={formatValue(current.wind_speed_10m, ' km/h')} theme={theme} styles={styles} />
-        <View style={styles.dividerVertical} />
-        <Metric icon="rainy-outline" label="Rain" value={Number.isFinite(Number(current.precipitation)) ? `${Number(current.precipitation).toFixed(1)} mm` : 'N/A'} theme={theme} styles={styles} />
-      </Surface>
-
-      <SectionTitle icon="time-outline" title="Next 12 hours" theme={theme} styles={styles} />
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.hourlyRail}>
-        {nextHours.map((item, index) => (
-          <View key={item.time} style={[styles.hour, index === 0 && styles.currentHour]}>
-            <Text style={styles.hourTime}>{index === 0 ? 'Now' : new Date(item.time).toLocaleTimeString([], { hour: 'numeric' })}</Text>
-            <Ionicons name={weatherIconForCode(item.code)} size={24} color={index === 0 ? theme.colors.primary : theme.colors.secondary} />
-            <Text style={styles.hourTemp}>{formatValue(item.temp, '°')}</Text>
-            <Text style={styles.hourRain}>{formatValue(item.rainChance, '%')}</Text>
+          <View style={styles.heroBottom}>
+            <View style={styles.riskRow}>
+              <Ionicons name={risk.icon} size={16} color={riskColor} />
+              <Text style={[styles.risk, { color: riskColor }]}>{risk.label}</Text>
+            </View>
+            <Text style={styles.updated}>{updatedAt ? `Checked ${updatedAt}` : 'Updating'}</Text>
           </View>
-        ))}
+        </LinearGradient>
+        <View style={styles.sourceRow}>
+          <Ionicons name="git-compare-outline" size={16} color={theme.colors.secondary} />
+          <Text style={styles.sourceText} numberOfLines={1}>
+            {weatherMeta.modelCount
+              ? `Open-Meteo · ${weatherMeta.modelCount} models · ${weatherMeta.rainVotes}/${weatherMeta.modelCount} detect rain`
+              : 'Open-Meteo live forecast'}
+          </Text>
+          <Text style={styles.confidence}>{weatherMeta.confidence ?? 'Live'}</Text>
+        </View>
+        <Surface elevation={1} style={styles.metrics}>
+          <Metric icon="water-outline" label="Humidity" value={formatValue(current.relative_humidity_2m, '%')} theme={theme} styles={styles} />
+          <View style={styles.dividerVertical} />
+          <Metric icon="navigate-outline" label="Wind" value={formatValue(current.wind_speed_10m, ' km/h')} theme={theme} styles={styles} />
+          <View style={styles.dividerVertical} />
+          <Metric icon="rainy-outline" label="Rain" value={Number.isFinite(Number(current.precipitation)) ? `${Number(current.precipitation).toFixed(1)} mm` : 'N/A'} theme={theme} styles={styles} />
+        </Surface>
+        <SectionTitle icon="time-outline" title="Next 12 hours" theme={theme} styles={styles} />
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.hourlyRail}>
+          {nextHours.map((item, index) => (
+            <View key={item.time} style={[styles.hour, index === 0 && styles.currentHour]}>
+              <Text style={styles.hourTime}>{index === 0 ? 'Now' : new Date(item.time).toLocaleTimeString([], { hour: 'numeric' })}</Text>
+              <Ionicons name={weatherIconForCode(item.code)} size={24} color={index === 0 ? theme.colors.primary : theme.colors.secondary} />
+              <Text style={styles.hourTemp}>{formatValue(item.temp, '°')}</Text>
+              <Text style={styles.hourRain}>{formatValue(item.rainChance, '%')}</Text>
+            </View>
+          ))}
+        </ScrollView>
+        <SectionTitle icon="calendar-outline" title="3-day outlook" theme={theme} styles={styles} />
+        <Surface elevation={1} style={styles.forecast}>
+          {(daily.time ?? []).slice(0, 3).map((date, index) => (
+            <View key={date} style={[styles.forecastRow, index > 0 && styles.rowDivider]}>
+              <View style={styles.dayCell}>
+                <Ionicons name={weatherIconForCode(daily.weather_code?.[index])} size={22} color={theme.colors.secondary} />
+                <Text style={styles.day}>{new Date(date).toLocaleDateString([], { weekday: 'long' })}</Text>
+              </View>
+              <Text style={styles.highLow}>{formatValue(daily.temperature_2m_max?.[index], '°')} / {formatValue(daily.temperature_2m_min?.[index], '°')}</Text>
+              <Text style={styles.rainTotal}>{formatValue(daily.precipitation_sum?.[index], ' mm')}</Text>
+            </View>
+          ))}
+        </Surface>
       </ScrollView>
-
-      <SectionTitle icon="calendar-outline" title="3-day outlook" theme={theme} styles={styles} />
-      <Surface elevation={1} style={styles.forecast}>
-        {(daily.time ?? []).slice(0, 3).map((date, index) => (
-          <View key={date} style={[styles.forecastRow, index > 0 && styles.rowDivider]}>
-            <View style={styles.dayCell}>
-              <Ionicons name={weatherIconForCode(daily.weather_code?.[index])} size={22} color={theme.colors.secondary} />
-              <Text style={styles.day}>{new Date(date).toLocaleDateString([], { weekday: 'long' })}</Text>
-            </View>
-            <Text style={styles.highLow}>{formatValue(daily.temperature_2m_max?.[index], '°')} / {formatValue(daily.temperature_2m_min?.[index], '°')}</Text>
-            <Text style={styles.rainTotal}>{formatValue(daily.precipitation_sum?.[index], ' mm')}</Text>
-          </View>
-        ))}
-      </Surface>
-    </ScrollView>
+      {shouldShowRain && (
+        <RainBackground
+          intensity={150}
+          speed={1}
+          color="rgba(174, 194, 224, 0.6)"
+          angle={10}
+          dropSize={{ min: 1, max: 2 }}
+        />
+      )}
+    </View>
   );
-};
+}
 
 const Metric = ({ icon, label, value, theme, styles }) => (
   <View style={styles.metric}>
@@ -356,7 +368,8 @@ const SectionTitle = ({ icon, title, theme, styles }) => (
 );
 
 const createStyles = (theme) => StyleSheet.create({
-  screen: { flex: 1, backgroundColor: theme.colors.background },
+  screenContainer: { flex: 1, backgroundColor: theme.colors.background },
+  screen: { flex: 1, backgroundColor: 'transparent' },
   content: { paddingHorizontal: theme.spacing.md, paddingTop: 18, paddingBottom: theme.spacing.lg, gap: theme.spacing.md },
   center: { flex: 1, justifyContent: 'center', backgroundColor: theme.colors.background },
   header: { gap: 5 },
