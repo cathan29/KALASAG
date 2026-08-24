@@ -1,6 +1,7 @@
 import 'react-native-gesture-handler';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { AppState, StatusBar, StyleSheet, useColorScheme, View, Platform } from 'react-native';
+import { AppState, StatusBar, StyleSheet, useColorScheme, View, Platform, Animated, Image } from 'react-native';
+import * as ExpoSplashScreen from 'expo-splash-screen';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { DarkTheme, DefaultTheme, NavigationContainer } from '@react-navigation/native';
 import { PaperProvider } from 'react-native-paper';
@@ -30,6 +31,8 @@ Notifications.setNotificationHandler({
   }),
 });
 
+ExpoSplashScreen.preventAutoHideAsync();
+
 const ALERT_REFRESH_INTERVAL_MS = 5 * 60 * 1000;
 
 const buildLocationLabel = (places) => {
@@ -44,6 +47,8 @@ const buildLocationLabel = (places) => {
 
 export default function App() {
   const [showSplash, setShowSplash] = useState(true);
+  const fadeAnim = useRef(new Animated.Value(1)).current;
+  const [isOverlayVisible, setIsOverlayVisible] = useState(true);
   const colorScheme = useColorScheme();
   const isDarkMode = colorScheme !== 'light';
   const appTheme = createAppTheme(isDarkMode);
@@ -163,44 +168,85 @@ export default function App() {
     initializeLocation();
   }, []);
 
+  useEffect(() => {
+    if (!showSplash) {
+      const transition = async () => {
+        // Artificial delay to ensure user sees the logo
+        await new Promise(resolve => setTimeout(resolve, 1800));
+
+        await ExpoSplashScreen.hideAsync();
+        Animated.timing(fadeAnim, {
+          toValue: 0,
+          duration: 800,
+          useNativeDriver: true,
+        }).start(() => {
+          setIsOverlayVisible(false);
+        });
+      };
+      transition();
+    }
+  }, [showSplash]);
+
   if (showSplash) {
     return <SplashScreen onFinish={() => setShowSplash(false)} />;
   }
 
   return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
-      <SafeAreaProvider>
-        <PaperProvider theme={appTheme}>
-          <NavigationContainer
-            ref={navigationRef}
-            onReady={handleNavigationReady}
-            theme={{
-              ...(isDarkMode ? DarkTheme : DefaultTheme),
-              colors: {
-                ...(isDarkMode ? DarkTheme.colors : DefaultTheme.colors),
-                background: appTheme.colors.background,
-                card: appTheme.colors.surface,
-                border: appTheme.colors.border,
-                primary: appTheme.colors.primary,
-                text: appTheme.colors.text.primary,
-              },
-            }}
-          >
-            <StatusBar
-              barStyle={isDarkMode ? 'light-content' : 'dark-content'}
-              backgroundColor={appTheme.colors.background}
-              translucent={false}
-            />
-            <SafeAreaView style={[styles.safeArea, { backgroundColor: appTheme.colors.background }]} edges={['top']}>
-              <OfflineBanner />
-              <View style={styles.navigator}>
-                <AppNavigator />
-              </View>
-            </SafeAreaView>
-          </NavigationContainer>
-        </PaperProvider>
-      </SafeAreaProvider>
-    </GestureHandlerRootView>
+    <>
+      {isOverlayVisible && (
+        <Animated.View
+          pointerEvents="none"
+          style={[
+            StyleSheet.absoluteFillObject,
+            {
+              backgroundColor: appTheme.colors.background,
+              opacity: fadeAnim,
+              zIndex: 9999,
+              justifyContent: 'center',
+              alignItems: 'center',
+            },
+          ]}
+        >
+          <Image
+            source={require('./assets/mascot/kalasag.png')}
+            style={{ width: 120, height: 120 }}
+          />
+        </Animated.View>
+      )}
+      <GestureHandlerRootView style={{ flex: 1 }}>
+        <SafeAreaProvider>
+          <PaperProvider theme={appTheme}>
+            <NavigationContainer
+              ref={navigationRef}
+              onReady={handleNavigationReady}
+              theme={{
+                ...(isDarkMode ? DarkTheme : DefaultTheme),
+                colors: {
+                  ...(isDarkMode ? DarkTheme.colors : DefaultTheme.colors),
+                  background: appTheme.colors.background,
+                  card: appTheme.colors.surface,
+                  border: appTheme.colors.border,
+                  primary: appTheme.colors.primary,
+                  text: appTheme.colors.text.primary,
+                },
+              }}
+            >
+              <StatusBar
+                barStyle={isDarkMode ? 'light-content' : 'dark-content'}
+                backgroundColor={appTheme.colors.background}
+                translucent={false}
+              />
+              <SafeAreaView style={[styles.safeArea, { backgroundColor: appTheme.colors.background }]} edges={['top']}>
+                <OfflineBanner />
+                <View style={styles.navigator}>
+                  <AppNavigator />
+                </View>
+              </SafeAreaView>
+            </NavigationContainer>
+          </PaperProvider>
+        </SafeAreaProvider>
+      </GestureHandlerRootView>
+    </>
   );
 }
 

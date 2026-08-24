@@ -73,6 +73,13 @@ const formatValue = (value, suffix = '') => (
   Number.isFinite(Number(value)) ? `${Math.round(Number(value))}${suffix}` : 'N/A'
 );
 
+const formatForecastDate = (date, index) => {
+  if (index === 0) return 'Today';
+  if (index === 1) return 'Tomorrow';
+  return new Date(date).toLocaleDateString([], { weekday: 'short' });
+};
+
+
 const WEATHER_REFRESH_INTERVAL_MS = 5 * 60 * 1000;
 
 const distanceInKm = (from, to) => {
@@ -317,16 +324,15 @@ const WeatherScreen = () => {
             </View>
           ))}
         </ScrollView>
-        <SectionTitle icon="calendar-outline" title="3-day outlook" theme={theme} styles={styles} />
-        <Surface elevation={1} style={styles.forecast}>
-          {(daily.time ?? []).slice(0, 3).map((date, index) => (
+        <SectionTitle icon="calendar-outline" title="7-day forecast" theme={theme} styles={styles} />
+        <Surface elevation={1} style={styles.forecastContainer}>
+          {(daily.time ?? []).slice(0, 7).map((date, index) => (
             <View key={date} style={[styles.forecastRow, index > 0 && styles.rowDivider]}>
-              <View style={styles.dayCell}>
-                <Ionicons name={weatherIconForCode(daily.weather_code?.[index])} size={22} color={theme.colors.secondary} />
-                <Text style={styles.day}>{new Date(date).toLocaleDateString([], { weekday: 'long' })}</Text>
-              </View>
-              <Text style={styles.highLow}>{formatValue(daily.temperature_2m_max?.[index], '°')} / {formatValue(daily.temperature_2m_min?.[index], '°')}</Text>
-              <Text style={styles.rainTotal}>{formatValue(daily.precipitation_sum?.[index], ' mm')}</Text>
+              <Text style={styles.dayLabel}>{formatForecastDate(date, index)}</Text>
+              <Ionicons name={weatherIconForCode(daily.weather_code?.[index])} size={22} color={theme.colors.secondary} />
+              <Text style={styles.tempRange}>
+                {formatValue(daily.temperature_2m_min?.[index], '°')} / {formatValue(daily.temperature_2m_max?.[index], '°')}
+              </Text>
             </View>
           ))}
         </Surface>
@@ -399,13 +405,11 @@ const createStyles = (theme) => StyleSheet.create({
   hourTime: { color: theme.colors.text.secondary, fontSize: 12, fontWeight: '600' },
   hourTemp: { color: theme.colors.text.primary, fontSize: 17, fontWeight: '700' },
   hourRain: { color: theme.colors.text.muted, fontSize: 11 },
-  forecast: { backgroundColor: theme.colors.surface, borderRadius: theme.borderRadius.md, borderWidth: StyleSheet.hairlineWidth, borderColor: theme.colors.border, overflow: 'hidden' },
-  forecastRow: { minHeight: 64, flexDirection: 'row', alignItems: 'center', paddingHorizontal: theme.spacing.md, gap: theme.spacing.sm },
+  forecastContainer: { backgroundColor: theme.colors.surface, borderRadius: theme.borderRadius.md, borderWidth: StyleSheet.hairlineWidth, borderColor: theme.colors.border, overflow: 'hidden' },
+  forecastRow: { minHeight: 64, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: theme.spacing.md, paddingVertical: theme.spacing.sm },
   rowDivider: { borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: theme.colors.border },
-  dayCell: { width: 122, flexDirection: 'row', alignItems: 'center', gap: 9 },
-  day: { flex: 1, color: theme.colors.text.primary, fontSize: 14, fontWeight: '600' },
-  highLow: { flex: 1, color: theme.colors.text.secondary, fontSize: 14, textAlign: 'center', fontVariant: ['tabular-nums'] },
-  rainTotal: { width: 58, color: theme.colors.text.muted, fontSize: 12, textAlign: 'right' },
+  dayLabel: { color: theme.colors.text.primary, fontSize: 14, fontWeight: '600' },
+  tempRange: { color: theme.colors.text.secondary, fontSize: 14, fontVariant: ['tabular-nums'] },
 });
 
 export default WeatherScreen;

@@ -97,7 +97,7 @@ const buildWeatherUrl = ({ latitude, longitude }) => {
     daily: 'weather_code,temperature_2m_max,temperature_2m_min,precipitation_sum,wind_speed_10m_max',
     models: MODEL_SUFFIXES.join(','),
     timezone: 'auto',
-    forecast_days: '3',
+    forecast_days: '7',
     cell_selection: 'land',
   });
   return `${OPEN_METEO_URL}?${params.toString()}`;
